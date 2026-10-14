@@ -1,0 +1,32 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "agent-gestion-proactiva",
+    "description": "Agente de Gestión Proactiva — ranking Renove WiFi",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/anomalias/status": {
+      "get": {
+        "summary": "Estado de la iniciativa",
+        "operationId": "status_api_anomalias_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Status Api Anomalias Status Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

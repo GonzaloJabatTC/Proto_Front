@@ -1,0 +1,87 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "agent-gestion-proactiva",
+    "description": "Agente de Gestión Proactiva — ranking Renove WiFi",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "summary": "Liveness and readiness",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/.well-known/agent-card.json": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Agent card generated at runtime",
+        "operationId": "agent_card_api__well_known_agent_card_json_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Agent Card Api  Well Known Agent Card Json Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "agent": {
+            "type": "string",
+            "title": "Agent"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "runtime": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Runtime"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "agent",
+          "version"
+        ],
+        "title": "HealthResponse",
+        "description": "Body returned by ``/api/health``."
+      }
+    }
+  }
+}
