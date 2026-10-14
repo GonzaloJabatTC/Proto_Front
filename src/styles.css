@@ -1,0 +1,1433 @@
+:root {
+  /* Fluent 2 / model-driven look: estos tokens replican la apariencia que
+     tendra el frontal definitivo en Power Apps model-driven. */
+  --canvas: #f5f5f5; /* neutralBackground3 — fondo del area de trabajo */
+  --card: #ffffff;
+  --border: #e0e0e0; /* neutralStroke2 */
+
+  /* Typography */
+  --title: #242424; /* neutralForeground1 */
+  --text: #242424;
+  --label: #616161; /* neutralForeground3 — etiquetas secundarias */
+  --kpi: #0f6cbd; /* brandForeground1 */
+
+  /* Data-viz palette (azules Fluent) */
+  --series-1: #0f6cbd;
+  --series-2: #4f9fd0;
+  --series-3: #115ea3;
+  --series-4: #0a3a63;
+
+  /* Semantic (paleta de estado Fluent) */
+  --accent: #0f6cbd; /* brand */
+  --accent-hover: #115ea3;
+  --accent-pressed: #0c3b5e;
+  --ok: #107c10;
+  --fail: #c50f1f;
+
+  /* Shell */
+  --topbar-bg: #003345; /* cabecera oscura de la app (personalizable en MDA) */
+  --sitemap-bg: #ffffff;
+  --sitemap-width: 220px;
+  --sitemap-collapsed-width: 48px;
+
+  --radius: 4px; /* Fluent borderRadiusMedium */
+  --shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.14); /* shadow2 */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont,
+    Roboto, Helvetica, Arial, sans-serif;
+  background: var(--canvas);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ================= Shell model-driven ================= */
+
+.md-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.md-topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 48px;
+  padding: 0 12px;
+  background: var(--topbar-bg);
+  color: #fff;
+}
+
+.md-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.md-topbar-logo {
+  height: 24px;
+  width: auto;
+}
+
+.md-topbar-title {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.md-topbar-area {
+  font-size: 13px;
+  opacity: 0.85;
+  white-space: nowrap;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.md-topbar-search {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.md-topbar-search .fui-Input {
+  width: min(420px, 100%);
+}
+
+.md-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Botones transparentes de la cabecera: iconos en blanco sobre fondo oscuro. */
+.md-topbar .md-topbar-btn,
+.md-topbar .md-topbar-btn:hover,
+.md-topbar .md-topbar-btn:hover:active {
+  color: #fff;
+  min-width: 32px;
+}
+.md-topbar .md-topbar-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.md-body {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+/* --- Sitemap (barra lateral de navegación) --- */
+
+.md-sitemap {
+  flex: 0 0 var(--sitemap-width);
+  width: var(--sitemap-width);
+  display: flex;
+  flex-direction: column;
+  background: var(--sitemap-bg);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  transition: width 0.15s ease, flex-basis 0.15s ease;
+}
+
+.md-sitemap.collapsed {
+  flex-basis: var(--sitemap-collapsed-width);
+  width: var(--sitemap-collapsed-width);
+}
+
+.md-sitemap-top {
+  padding: 6px;
+}
+
+.md-sitemap-pages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.md-sitemap-group {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--label);
+  padding: 8px 16px 4px;
+  text-transform: none;
+}
+
+.md-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 8px 12px;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 400;
+}
+
+.md-nav-item:hover {
+  background: #f5f5f5;
+}
+
+.md-nav-item.selected {
+  background: #ebebeb;
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.md-nav-icon {
+  display: inline-flex;
+  font-size: 18px;
+  color: var(--label);
+  flex: 0 0 auto;
+}
+
+.md-nav-item.selected .md-nav-icon {
+  color: var(--accent);
+}
+
+.md-nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.md-sitemap-footer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--border);
+  padding: 8px;
+}
+
+.md-sitemap-footer .md-area-switcher {
+  width: 100%;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+/* --- Contenido --- */
+
+.md-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 16px 20px 32px;
+}
+
+.md-page-header {
+  margin-bottom: 12px;
+}
+
+.md-page-header h1 {
+  margin: 0 0 2px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--title);
+}
+
+.muted {
+  color: var(--label);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* The catalog and the scoring library are tall lists inside a single column:
+   cap their height so the panels below stay reachable without endless scroll. */
+.catalog-panel,
+.library-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 620px;
+  overflow: hidden;
+}
+
+.library-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.library-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.library-item.is-active {
+  border-color: var(--accent);
+}
+
+.library-item header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.library-item header > button:not(.library-title),
+.library-version-actions button {
+  width: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.library-item > header > .library-title:not(button) {
+  font-weight: 600;
+  color: var(--title);
+}
+
+.library-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  color: var(--title);
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.library-caret {
+  color: var(--muted);
+}
+
+.library-digest {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.library-versions {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.library-versions li {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.library-version-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+}
+
+.library-reason {
+  margin: 6px 0;
+  font-size: 0.84rem;
+  white-space: pre-wrap;
+}
+
+.library-version-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chip-champion {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+.explanation-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.catalog-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.work-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.work-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.col-left,
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--title);
+}
+
+.empty {
+  color: var(--label);
+  text-align: center;
+  padding: 48px 16px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--label);
+  margin-bottom: 12px;
+}
+
+/* Controles nativos con la apariencia de los inputs Fluent / model-driven:
+   radio 4px, borde neutralStroke1 y subrayado de acento al enfocar. */
+input,
+select,
+button {
+  background: #ffffff;
+  border: 1px solid #d1d1d1;
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 5px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: inset 0 -2px 0 0 var(--accent);
+}
+
+select {
+  text-overflow: ellipsis;
+}
+
+.run-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.run-controls h2 {
+  flex-basis: 100%;
+  margin-bottom: 2px;
+}
+
+.run-controls > label {
+  flex: 2 1 220px;
+  margin-bottom: 0;
+}
+
+.run-controls .row {
+  display: contents;
+}
+
+.run-controls .row label {
+  flex: 1 1 130px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.run-controls button {
+  width: auto;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  white-space: nowrap;
+}
+.run-controls .load-data-btn {
+  flex-basis: 100%;
+  align-self: stretch;
+}
+
+/* Boton primario Fluent (mismo estilo que Button appearance="primary"). */
+button {
+  cursor: pointer;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+button:active:not(:disabled) {
+  background: var(--accent-pressed);
+  border-color: var(--accent-pressed);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.params-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.params-head h2 {
+  margin: 0;
+}
+
+.params-head button {
+  align-self: flex-start;
+}
+
+.table-scroll {
+  max-height: 460px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: #fafafa;
+  color: var(--label);
+  font-weight: 600;
+  z-index: 1;
+}
+
+tbody tr:hover {
+  background: #f5f5f5;
+}
+
+.var-name {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 12px;
+  color: var(--series-4);
+}
+
+.weight-input {
+  width: 72px;
+}
+
+.row-disabled {
+  opacity: 0.4;
+}
+
+.reasons {
+  white-space: normal;
+  color: var(--label);
+  font-size: 12px;
+}
+
+.score-cell {
+  position: relative;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-cell span {
+  font-weight: 700;
+  color: var(--kpi);
+  font-variant-numeric: tabular-nums;
+}
+
+.score-bar {
+  height: 8px;
+  background: linear-gradient(90deg, var(--series-2), var(--series-1));
+  border-radius: 4px;
+  min-width: 2px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #eef1f4;
+  color: var(--series-3);
+  font-size: 11px;
+  font-weight: 600;
+  /* Chips sit inside flex headers: never let them shrink and wrap mid-label. */
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.chip-alta {
+  background: rgba(15, 108, 189, 0.12);
+  color: var(--series-1);
+}
+.chip-baja {
+  background: rgba(197, 15, 31, 0.12);
+  color: var(--fail);
+}
+.chip-activo {
+  background: rgba(15, 108, 189, 0.14);
+  color: var(--series-2);
+}
+
+.status-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.qc-panel .muted strong {
+  color: var(--kpi);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.gate {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  background: #fafbfc;
+}
+
+.gate strong {
+  color: var(--title);
+}
+
+.gate-ok {
+  border-left: 4px solid var(--ok);
+}
+.gate-fail {
+  border-left: 4px solid var(--fail);
+}
+
+.gate ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--text);
+}
+
+.publishable {
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.publishable.yes {
+  color: var(--ok);
+}
+.publishable.no {
+  color: var(--fail);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--label);
+}
+
+.pager button {
+  width: auto;
+}
+
+.export-link {
+  color: var(--accent);
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.export-link:hover {
+  text-decoration: underline;
+}
+
+.banner {
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.banner.error {
+  background: rgba(197, 15, 31, 0.08);
+  border: 1px solid var(--fail);
+  color: var(--fail);
+}
+
+.banner.info {
+  background: rgba(15, 108, 189, 0.08);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* ---- Error modal ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 30, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 480px;
+  padding: 20px 22px;
+}
+
+.modal-card.error {
+  border-top: 4px solid var(--fail);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.modal-head h3 {
+  margin: 0;
+  color: var(--fail);
+  font-size: 16px;
+}
+
+.modal-body {
+  margin: 0 0 18px;
+  font-size: 14px;
+  color: #333;
+  word-break: break-word;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---- Shared secondary controls ---- */
+/* Boton secundario Fluent (Button appearance="secondary"). */
+button.ghost {
+  background: #fff;
+  color: var(--text);
+  border-color: #d1d1d1;
+  font-weight: 600;
+  width: auto;
+  padding: 5px 12px;
+}
+button.ghost:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #c7c7c7;
+  color: var(--text);
+}
+button.ghost.danger {
+  color: var(--fail);
+}
+label.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+}
+input.mini {
+  width: 68px;
+}
+.head-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---- Catalog panel ---- */
+.catalog-group {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.catalog-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  color: var(--title);
+  border: none;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.catalog-panel-head:hover {
+  color: var(--accent);
+}
+.catalog-group-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--canvas);
+  color: var(--title);
+  border: none;
+  border-radius: 0;
+  font-weight: 600;
+  /* Buttons centre their text by default; group titles must read left-aligned
+     like every other label in the catalog. */
+  text-align: left;
+}
+.catalog-group-head > span:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.catalog-group-head:hover:not(:disabled) {
+  background: #eaeef2;
+}
+.catalog-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.catalog-list li {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+}
+.catalog-col-name {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 12px;
+  color: var(--series-4);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.catalog-col-desc {
+  font-size: 12px;
+  color: var(--label);
+  margin-top: 2px;
+}
+.catalog-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 4px;
+}
+.catalog-metrics .metric {
+  font-size: 11px;
+  color: var(--series-3);
+}
+.catalog-metrics .metric-top {
+  flex-basis: 100%;
+}
+.chip-num {
+  background: rgba(15, 108, 189, 0.12);
+  color: var(--series-1);
+}
+
+/* ---- Post-run analysis report + proposal ---- */
+.chip-btn {
+  width: auto;
+  background: #fff;
+  color: var(--series-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+}
+.chip-btn:hover:not(:disabled) {
+  background: var(--canvas);
+}
+.report-text {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.proposal {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: rgba(15, 108, 189, 0.04);
+}
+.proposal-head {
+  font-weight: 600;
+  color: var(--title);
+  margin-bottom: 6px;
+}
+.proposal-terms {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 12px;
+}
+.proposal-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.proposal-actions button {
+  width: auto;
+}
+.proposal-name {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+/* ---- Weights panel (formula preview + editor) ---- */
+.formula-preview {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--canvas);
+  padding: 12px;
+  margin-bottom: 14px;
+}
+.formula-preview-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.formula-preview-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.fx-term {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.fx-op {
+  color: var(--label);
+  font-weight: 600;
+}
+.fx-weight {
+  color: var(--kpi);
+  font-weight: 700;
+}
+.fx-times {
+  color: var(--label);
+}
+.fx-var {
+  color: var(--series-4);
+}
+.fx-dir {
+  font-weight: 600;
+}
+.fx-lower_is_better {
+  color: var(--fail);
+}
+.fx-higher_is_better {
+  color: var(--ok);
+}
+.formula-hint {
+  margin: 10px 0 0;
+  font-size: 11px;
+}
+
+.weights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.weight-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.weight-check {
+  width: auto;
+  flex: 0 0 auto;
+}
+.weight-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.weight-name {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 13px;
+  color: var(--series-4);
+  font-weight: 600;
+}
+.weight-desc {
+  font-size: 12px;
+  color: var(--label);
+  margin-top: 2px;
+}
+.weight-field {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+  font-size: 11px;
+}
+.weight-field .mini {
+  width: 74px;
+}
+.weight-field select {
+  width: auto;
+}
+
+.add-var {
+  margin-bottom: 12px;
+}
+.add-var input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.weight-remove {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 4px 8px;
+  align-self: center;
+}
+
+.weights-scroll {
+  max-height: 560px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* ---- Categorical terms ---- */
+.subhead {
+  margin: 18px 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--title);
+}
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.cat-term {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+}
+.cat-term-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cat-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.cat-map-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.cat-value {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 12px;
+  color: var(--series-4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fx-cat {
+  color: var(--series-2);
+}
+
+/* ---- Filters panel ---- */
+.filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.filter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.filter-row select {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 220px;
+}
+.filter-row input {
+  flex: 1 1 auto;
+}
+.filter-row button.ghost.danger {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+}
+.filter-values {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip-btn.chip-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---- Push panel ---- */
+.push-row {
+  display: flex;
+  gap: 8px;
+}
+.push-row button {
+  width: auto;
+  white-space: nowrap;
+}
+.push-result {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--label);
+  word-break: break-all;
+}
+.push-result code {
+  color: var(--series-4);
+}
+
+/* --- Vista Producción: scorings + seguimiento --- */
+.champion-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.row-champion {
+  background: rgba(15, 108, 189, 0.06);
+}
+.chip-champion {
+  margin-left: 8px;
+  background: var(--accent);
+  color: #fff;
+}
+/* ---- Runs log + run detail (Ejecución) ---- */
+.chip-auto {
+  background: rgba(15, 108, 189, 0.14);
+  color: var(--series-2);
+}
+.chip-manual {
+  background: #eef1f4;
+  color: var(--series-3);
+}
+.runs-panel td a.ghost {
+  margin-left: 6px;
+  text-decoration: none;
+}
+.run-detail h4 {
+  margin: 14px 0 6px;
+  font-size: 13px;
+  color: var(--title);
+}
+.run-detail ul.reasons {
+  margin: 0;
+  padding-left: 18px;
+}
+.notice {
+  border-left: 4px solid var(--accent);
+  font-size: 13px;
+}
+.notice button {
+  width: auto;
+  margin-left: 8px;
+}
+.followup-reasoning {
+  margin: 10px 0;
+  padding: 12px 14px;
+  background: #fafbfc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.kpi-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: #fafbfc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.kpi-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--title);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.kpi-card-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--kpi);
+}
+.kpi-card-sub {
+  font-size: 12px;
+  color: var(--muted, #6b7280);
+}
+.delta-down {
+  color: var(--ok);
+  font-weight: 600;
+}
+.delta-up {
+  color: var(--fail);
+  font-weight: 600;
+}
+.save-config-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.save-config-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.save-config-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.save-config-form select:disabled,
+.save-config-form input:disabled {
+  background: var(--surface-alt, #f4f4f4);
+  color: var(--muted);
+}
+/* Cabecera del "formulario" (detalle de una configuraci�n), con vuelta al listado. */
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+/* Columna principal de un listado: enlace que abre el registro (como en MDA). */
+button.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #115ea3;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.link-button:hover {
+  text-decoration: underline;
+}
+
+/* Barra de acciones del Cat�logo (el origen de datos vive en ? Configuraci�n). */
+.catalog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.catalog-actions p {
+  margin: 0;
+}
+
+/* Dentro del di�logo de configuraci�n, el panel va sin su marco propio. */
+.fui-DialogContent .run-controls {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+button.link-button {
+  text-align: left;
+}
+
+/* Filas de versi�n desplegadas bajo su configuraci�n (como un subgrid). */
+.row-version td {
+  background: #fafafa;
+}
+
+.row-version td.version-cell {
+  padding-left: 34px;
+}
+
+/* Nombre de la configuraci�n en el listado: tipograf�a normal, no monoespaciada. */
+.scorings-panel td.config-name button.link-button {
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.scorings-panel th:nth-child(2),
+.scorings-panel td:nth-child(2),
+.scorings-panel th:nth-child(4),
+.scorings-panel td:nth-child(4) {
+  text-align: left;
+}
+
+.scorings-panel .champion-radio {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Subt�tulo del formulario de detalle (metadatos de la versi�n abierta). */
+.form-subtitle {
+  margin: -8px 0 0;
+}
+
+/* El enlace de registro no hereda el relleno azul de los botones globales. */
+button.link-button,
+button.link-button:hover:not(:disabled),
+button.link-button:active:not(:disabled) {
+  background: none;
+  border-color: transparent;
+  width: auto;
+}
+
+button.link-button:hover:not(:disabled) {
+  color: #0f548c;
+  text-decoration: underline;
+}
+
+.form-subtitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Listado de configuraciones: mostrar todas las filas sin scroll interno. */
+.scorings-panel .table-scroll {
+  max-height: none;
+}
+
+/* Bloque de simulacion: ruta vigilada encima del boton. */
+.simulate-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 12px;
+}
+
+.simulate-block p {
+  margin: 0;
+}
+
+.simulate-block button {
+  align-self: flex-start;
+}

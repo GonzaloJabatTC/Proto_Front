@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gestión Proactiva WiFi — Mock estático</title>
+<style>
+:root {
+  --canvas: #f5f5f5;
+  --card: #ffffff;
+  --border: #e0e0e0;
+  --title: #242424;
+  --text: #242424;
+  --label: #616161;
+  --muted: #616161;
+  --kpi: #0f6cbd;
+  --series-1: #0f6cbd;
+  --series-2: #4f9fd0;
+  --series-3: #115ea3;
+  --series-4: #0a3a63;
+  --accent: #0f6cbd;
+  --accent-hover: #115ea3;
+  --accent-pressed: #0c3b5e;
+  --ok: #107c10;
+  --fail: #c50f1f;
+  --topbar-bg: #003345;
+  --sitemap-bg: #ffffff;
+  --sitemap-width: 220px;
+  --sitemap-collapsed-width: 48px;
+  --radius: 4px;
+  --shadow: 0 0 2px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.14);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI","Segoe UI Web (West European)",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+  background: var(--canvas);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Shell model-driven ===== */
+.md-shell { display:flex; flex-direction:column; height:100vh; }
+.md-topbar {
+  flex:0 0 auto; display:flex; align-items:center; gap:16px;
+  height:48px; padding:0 12px; background:var(--topbar-bg); color:#fff;
+}
+.md-topbar-left { display:flex; align-items:center; gap:8px; min-width:0; }
+.md-topbar-logo { height:24px; width:auto; display:inline-flex; }
+.md-topbar-title { font-size:15px; font-weight:600; white-space:nowrap; }
+.md-topbar-area { font-size:13px; opacity:.85; white-space:nowrap; padding-left:12px; border-left:1px solid rgba(255,255,255,.35); }
+.md-topbar-search { flex:1 1 auto; display:flex; justify-content:center; }
+.md-topbar-search .fake-input {
+  width:min(420px,100%); display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.14); border-radius:4px; height:30px; padding:0 10px;
+  color:rgba(255,255,255,.75); font-size:13px;
+}
+.md-topbar-right { display:flex; align-items:center; gap:4px; }
+.md-topbar-btn {
+  background:transparent; border:none; color:#fff; min-width:32px; min-height:32px;
+  display:inline-flex; align-items:center; justify-content:center; border-radius:4px;
+  cursor:pointer; font-size:16px; padding:0 6px; width:auto;
+}
+.md-topbar-btn:hover { background:rgba(255,255,255,.12); }
+.md-avatar {
+  width:28px; height:28px; border-radius:50%; background:#b4009e; color:#fff;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:600; margin-left:6px;
+}
+.md-body { flex:1 1 auto; display:flex; min-height:0; }
+
+/* ----- Sitemap ----- */
+.md-sitemap {
+  flex:0 0 var(--sitemap-width); width:var(--sitemap-width);
+  display:flex; flex-direction:column; background:var(--sitemap-bg);
+  border-right:1px solid var(--border); overflow:hidden;
+  transition:width .15s ease, flex-basis .15s ease;
+}
+.md-sitemap.collapsed { flex-basis:var(--sitemap-collapsed-width); width:var(--sitemap-collapsed-width); }
+.md-sitemap.collapsed .md-nav-label,
+.md-sitemap.collapsed .md-sitemap-group { display:none; }
+.md-sitemap-top { padding:6px; }
+.md-sitemap-top button {
+  background:transparent; border:none; width:36px; min-height:32px; cursor:pointer;
+  border-radius:4px; color:var(--text); font-size:16px; padding:0;
+}
+.md-sitemap-top button:hover { background:#f5f5f5; }
+.md-sitemap-pages { flex:1 1 auto; overflow-y:auto; padding:4px 0; }
+.md-sitemap-group { font-size:12px; font-weight:600; color:var(--label); padding:8px 16px 4px; }
+.md-nav-item {
+  display:flex; align-items:center; gap:10px; width:100%;
+  border:none; background:transparent; color:var(--text);
+  font-size:14px; font-family:inherit; padding:8px 12px;
+  border-left:3px solid transparent; border-radius:0; cursor:pointer;
+  text-align:left; font-weight:400; min-height:0;
+}
+.md-nav-item:hover { background:#f5f5f5; }
+.md-nav-item.selected { background:#ebebeb; border-left-color:var(--accent); font-weight:600; }
+.md-nav-icon { display:inline-flex; font-size:16px; color:var(--label); flex:0 0 auto; width:18px; justify-content:center; }
+.md-nav-item.selected .md-nav-icon { color:var(--accent); }
+.md-nav-label { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.md-sitemap-footer { flex:0 0 auto; border-top:1px solid var(--border); padding:8px; position:relative; }
+.md-area-switcher {
+  width:100%; display:flex; justify-content:space-between; align-items:center;
+  font-weight:600; background:transparent; border:none; color:var(--text);
+  padding:6px 8px; border-radius:4px; cursor:pointer; font-size:13px; font-family:inherit;
+}
+.md-area-switcher:hover { background:#f5f5f5; }
+.md-area-menu {
+  position:absolute; bottom:48px; left:8px; min-width:220px;
+  background:#fff; border:1px solid var(--border); border-radius:6px;
+  box-shadow:0 6px 20px rgba(0,0,0,.18); padding:4px; display:none; z-index:50;
+}
+.md-area-menu.open { display:block; }
+.md-area-menu button {
+  display:flex; align-items:center; gap:8px; width:100%; background:transparent;
+  border:none; text-align:left; padding:8px 10px; border-radius:4px;
+  font-size:13px; color:var(--text); cursor:pointer; font-weight:400; min-height:0;
+}
+.md-area-menu button:hover { background:#f5f5f5; }
+.md-area-menu .dot { width:14px; color:var(--accent); font-weight:700; }
+
+/* ----- Contenido ----- */
+.md-content { flex:1 1 auto; min-width:0; overflow-y:auto; padding:16px 20px 32px; }
+.md-page-header { margin-bottom:12px; }
+.md-page-header h1 { margin:0 0 2px; font-size:20px; font-weight:600; color:var(--title); }
+.muted { color:var(--label); font-size:13px; font-weight:400; }
+.work-main { display:flex; flex-direction:column; gap:16px; }
+.panel {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px; box-shadow:var(--shadow);
+}
+.panel h2 { margin:0 0 14px; font-size:16px; font-weight:600; color:var(--title); }
+label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:var(--label); margin-bottom:12px; }
+input, select, button {
+  background:#fff; border:1px solid #d1d1d1; border-radius:var(--radius);
+  color:var(--text); padding:5px 10px; font-size:14px; font-family:inherit;
+  width:100%; min-width:0; min-height:32px;
+}
+input:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:inset 0 -2px 0 0 var(--accent); }
+button { cursor:pointer; background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+button:hover:not(:disabled) { background:var(--accent-hover); border-color:var(--accent-hover); }
+button:disabled { opacity:.5; cursor:default; }
+button.ghost { background:#fff; color:var(--text); border-color:#d1d1d1; font-weight:600; width:auto; padding:5px 12px; }
+button.ghost:hover:not(:disabled) { background:#f5f5f5; border-color:#c7c7c7; color:var(--text); }
+button.ghost.danger { color:var(--fail); }
+a.ghost {
+  display:inline-block; background:#fff; color:var(--text); border:1px solid #d1d1d1;
+  border-radius:var(--radius); font-weight:600; width:auto; padding:5px 12px;
+  font-size:14px; text-decoration:none;
+}
+a.ghost:hover { background:#f5f5f5; }
+
+/* run controls */
+.run-controls { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
+.run-controls h2 { flex-basis:100%; margin-bottom:2px; }
+.run-controls > label { flex:2 1 220px; margin-bottom:0; }
+.run-controls .row { display:contents; }
+.run-controls .row label { flex:1 1 130px; min-width:0; margin-bottom:0; }
+.run-controls button { width:auto; flex:0 0 auto; align-self:flex-end; white-space:nowrap; }
+.run-controls .load-data-btn { flex-basis:100%; align-self:stretch; }
+
+.params-head { display:flex; flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:4px; }
+.params-head h2 { margin:0; }
+.params-head.row-head { flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:flex-start; }
+.params-head.row-head h2 { flex:1 1 auto; }
+.params-head.row-head button { width:auto; }
+
+.table-scroll { max-height:460px; overflow:auto; border:1px solid var(--border); border-radius:8px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+thead th { position:sticky; top:0; background:#fafafa; color:var(--label); font-weight:600; z-index:1; }
+tbody tr:hover { background:#f5f5f5; }
+.var-name { font-family:ui-monospace,"Cascadia Code",monospace; font-size:12px; color:var(--series-4); }
+.reasons { white-space:normal; color:var(--label); font-size:12px; }
+.score-cell { position:relative; min-width:120px; display:flex; align-items:center; gap:8px; }
+.score-cell span { font-weight:700; color:var(--kpi); font-variant-numeric:tabular-nums; }
+.score-bar { height:8px; background:linear-gradient(90deg,var(--series-2),var(--series-1)); border-radius:4px; min-width:2px; }
+
+.chip {
+  display:inline-block; padding:2px 10px; border-radius:999px; background:#eef1f4;
+  color:var(--series-3); font-size:11px; font-weight:600; white-space:nowrap; flex:0 0 auto;
+}
+.chip-alta { background:rgba(15,108,189,.12); color:var(--series-1); }
+.chip-baja { background:rgba(197,15,31,.12); color:var(--fail); }
+.chip-activo { background:rgba(15,108,189,.14); color:var(--series-2); }
+.chip-num { background:rgba(15,108,189,.12); color:var(--series-1); }
+.chip-auto { background:rgba(15,108,189,.14); color:var(--series-2); }
+.chip-manual { background:#eef1f4; color:var(--series-3); }
+.chip-champion { margin-left:8px; background:var(--accent); color:#fff; }
+.status-chips { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+.qc-panel .muted strong { color:var(--kpi); font-size:15px; font-weight:700; }
+
+.gate { border-radius:8px; padding:10px 12px; margin-bottom:8px; font-size:13px; border:1px solid var(--border); background:#fafbfc; }
+.gate strong { color:var(--title); }
+.gate-ok { border-left:4px solid var(--ok); }
+.gate-fail { border-left:4px solid var(--fail); }
+.gate ul { margin:6px 0 0; padding-left:18px; color:var(--text); }
+.publishable { margin-top:8px; font-weight:600; font-size:13px; }
+.publishable.yes { color:var(--ok); }
+.publishable.no { color:var(--fail); }
+
+.pager { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:12px; font-size:13px; color:var(--label); }
+.pager button { width:auto; }
+.export-link { color:var(--accent); font-size:13px; text-decoration:none; font-weight:600; }
+.export-link:hover { text-decoration:underline; }
+
+/* catalog */
+.catalog-panel { display:flex; flex-direction:column; max-height:620px; overflow:hidden; }
+.catalog-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; }
+.catalog-group { border:1px solid var(--border); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+.catalog-panel-head {
+  display:flex; justify-content:space-between; align-items:center; width:100%;
+  background:transparent; color:var(--title); border:none; padding:0;
+  font-size:18px; font-weight:600; cursor:pointer; min-height:0;
+}
+.catalog-panel-head:hover { color:var(--accent); }
+.catalog-group-head {
+  display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%;
+  background:var(--canvas); color:var(--title); border:none; border-radius:0;
+  font-weight:600; text-align:left;
+}
+.catalog-group-head > span:first-child { flex:1 1 auto; min-width:0; }
+.catalog-group-head:hover { background:#eaeef2; }
+.catalog-list { list-style:none; margin:0; padding:0; }
+.catalog-list li { padding:8px 12px; border-top:1px solid var(--border); }
+.catalog-col-name { font-family:ui-monospace,"Cascadia Code",monospace; font-size:12px; color:var(--series-4); display:flex; align-items:center; gap:6px; }
+.catalog-col-desc { font-size:12px; color:var(--label); margin-top:2px; }
+.catalog-metrics { display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:4px; }
+.catalog-metrics .metric { font-size:11px; color:var(--series-3); }
+.catalog-metrics .metric-top { flex-basis:100%; }
+
+/* library */
+.library-panel { display:flex; flex-direction:column; max-height:620px; overflow:hidden; }
+.library-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+.library-item { border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+.library-item.is-active { border-color:var(--accent); }
+.library-item header { display:flex; align-items:center; gap:8px; }
+.library-item header > button:not(.library-title),
+.library-version-actions button { width:auto; flex:0 0 auto; white-space:nowrap; }
+.library-item > header > span.library-title { font-weight:600; color:var(--title); }
+.library-title {
+  flex:1 1 auto; min-width:0; background:none; border:none; padding:0; text-align:left;
+  font:inherit; font-weight:600; color:var(--title); cursor:pointer;
+  display:flex; gap:6px; align-items:center; min-height:0;
+}
+.library-caret { color:var(--muted); }
+.library-digest { margin:6px 0 0; font-size:.8rem; color:var(--muted); }
+.library-versions { list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.library-versions li { border-top:1px solid var(--border); padding-top:8px; }
+.library-version-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.82rem; }
+.library-reason { margin:6px 0; font-size:.84rem; white-space:pre-wrap; }
+.library-version-actions { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+
+.explanation-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+.report-text { white-space:pre-wrap; font-family:inherit; font-size:13px; margin:0 0 8px; }
+
+/* formula & weights */
+.formula-preview { border:1px solid var(--border); border-radius:8px; background:var(--canvas); padding:12px; margin-bottom:14px; }
+.formula-preview-title { font-size:11px; font-weight:600; color:var(--label); text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; }
+.formula-preview-body { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; font-family:ui-monospace,"Cascadia Code",monospace; font-size:13px; line-height:1.9; }
+.fx-term { display:inline-flex; align-items:baseline; gap:3px; background:#fff; border:1px solid var(--border); border-radius:6px; padding:2px 8px; }
+.fx-op { color:var(--label); font-weight:600; }
+.fx-weight { color:var(--kpi); font-weight:700; }
+.fx-times { color:var(--label); }
+.fx-var { color:var(--series-4); }
+.fx-dir { font-weight:600; }
+.fx-lower { color:var(--fail); }
+.fx-higher { color:var(--ok); }
+.fx-cat { color:var(--series-2); }
+.formula-hint { margin:10px 0 0; font-size:11px; }
+.weights-scroll { max-height:560px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; }
+.weights-list { display:flex; flex-direction:column; gap:4px; }
+.weight-row { display:flex; align-items:center; gap:12px; padding:8px; border-bottom:1px solid var(--border); }
+.weight-check { width:auto; flex:0 0 auto; min-height:0; }
+.weight-info { flex:1 1 auto; min-width:0; }
+.weight-name { font-family:ui-monospace,"Cascadia Code",monospace; font-size:13px; color:var(--series-4); font-weight:600; }
+.weight-desc { font-size:12px; color:var(--label); margin-top:2px; }
+.weight-field { flex:0 0 auto; margin-bottom:0; font-size:11px; }
+.weight-field .mini { width:74px; }
+.weight-field select { width:auto; }
+.weight-remove { flex:0 0 auto; width:auto; padding:4px 8px; align-self:center; }
+input.mini { width:68px; }
+.add-var { margin-bottom:12px; }
+.add-var input { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-size:13px; }
+.subhead { margin:18px 0 4px; font-size:13px; font-weight:600; color:var(--title); }
+.cat-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.cat-term { border:1px solid var(--border); border-radius:8px; padding:10px; }
+.cat-term-head { display:flex; align-items:center; gap:12px; }
+.cat-map { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px 12px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
+.cat-map-row { flex-direction:row; align-items:center; justify-content:space-between; gap:8px; margin-bottom:0; }
+.cat-value { font-family:ui-monospace,"Cascadia Code",monospace; font-size:12px; color:var(--series-4); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.row-disabled { opacity:.4; }
+
+/* filters */
+.filter-list { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+.filter-row { display:flex; gap:8px; align-items:center; }
+.filter-row select { flex:0 0 auto; width:auto; max-width:220px; }
+.filter-row button.ghost.danger { flex:0 0 auto; padding:6px 10px; }
+.filter-values { flex:1 1 auto; display:flex; flex-wrap:wrap; gap:6px; }
+.chip-btn {
+  width:auto; min-height:0; background:#fff; color:var(--series-3); border:1px solid var(--border);
+  border-radius:999px; font-size:11px; font-weight:600; padding:4px 10px;
+}
+.chip-btn:hover:not(:disabled) { background:var(--canvas); }
+.chip-btn.chip-on { background:var(--accent); border-color:var(--accent); color:#fff; }
+.head-actions { display:flex; gap:8px; }
+
+/* save config */
+.save-config-form { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:10px; }
+.save-config-form label { display:flex; flex-direction:column; gap:4px; font-size:.82rem; color:var(--muted); }
+.save-config .panel-actions button { width:auto; }
+
+/* push */
+.push-row { display:flex; gap:8px; }
+.push-row button { width:auto; white-space:nowrap; }
+.push-result { margin-top:10px; font-size:12px; color:var(--label); word-break:break-all; }
+.push-result code { color:var(--series-4); }
+
+/* scorings / runs */
+.champion-radio { display:flex; align-items:center; justify-content:center; margin:0; }
+.champion-radio input { width:auto; min-height:0; }
+.row-champion { background:rgba(15,108,189,.06); }
+.runs-panel td a.ghost { margin-left:6px; text-decoration:none; padding:3px 10px; font-size:12px; }
+.runs-panel td button.ghost { padding:3px 10px; font-size:12px; }
+.run-detail h4 { margin:14px 0 6px; font-size:13px; color:var(--title); }
+.run-detail ul.reasons { margin:0; padding-left:18px; }
+.notice { border-left:4px solid var(--accent); font-size:13px; }
+.notice button { width:auto; margin-left:8px; }
+.followup-reasoning { margin:10px 0; padding:12px 14px; background:#fafbfc; border:1px solid var(--border); border-radius:8px; font-size:14px; color:var(--text); line-height:1.5; }
+.delta-down { color:var(--ok); font-weight:600; }
+.delta-up { color:var(--fail); font-weight:600; }
+
+.proposal { border:1px solid var(--accent); border-radius:8px; padding:10px 12px; margin-bottom:12px; background:rgba(15,108,189,.04); }
+.proposal-head { font-weight:600; color:var(--title); margin-bottom:6px; }
+.proposal-terms { margin:0 0 8px; padding-left:18px; font-size:12px; }
+.proposal-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.proposal-actions button { width:auto; }
+.proposal-name { flex:1 1 160px; min-width:0; }
+
+code { font-family:ui-monospace,"Cascadia Code",monospace; font-size:12px; }
+.hidden { display:none !important; }
+.mock-badge {
+  position:fixed; bottom:12px; right:16px; z-index:100;
+  background:#fde047; color:#713f12; font-size:11px; font-weight:700;
+  padding:4px 10px; border-radius:999px; box-shadow:var(--shadow);
+}
+</style>
+</head>
+<body>
+<div class="md-shell">
+  <!-- ===== Barra superior ===== -->
+  <header class="md-topbar">
+    <div class="md-topbar-left">
+      <button class="md-topbar-btn" title="Aplicaciones">⠿</button>
+      <span class="md-topbar-logo" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 100 100"><circle cx="30" cy="22" r="16" fill="#0066FF"/><circle cx="72" cy="22" r="16" fill="#0066FF"/><circle cx="18" cy="56" r="14" fill="#0066FF"/><circle cx="52" cy="60" r="16" fill="#0066FF"/><circle cx="55" cy="90" r="13" fill="#0066FF"/></svg>
+      </span>
+      <span class="md-topbar-title">Gestión Proactiva WiFi</span>
+      <span class="md-topbar-area" id="topbar-area">Priorización Renove</span>
+    </div>
+    <div class="md-topbar-search">
+      <div class="fake-input">🔍 Buscar</div>
+    </div>
+    <div class="md-topbar-right">
+      <button class="md-topbar-btn" title="Configuración">⚙</button>
+      <button class="md-topbar-btn" title="Ayuda">?</button>
+      <span class="md-avatar">NR</span>
+    </div>
+  </header>
+
+  <div class="md-body">
+    <!-- ===== Sitemap ===== -->
+    <nav class="md-sitemap" id="sitemap">
+      <div class="md-sitemap-top">
+        <button title="Contraer/Expandir" onclick="toggleNav()">☰</button>
+      </div>
+      <div class="md-sitemap-pages">
+        <div class="md-sitemap-group">Priorización Renove</div>
+        <button class="md-nav-item selected" id="nav-config" onclick="openPage('config')">
+          <span class="md-nav-icon">⚒</span><span class="md-nav-label">Configuración</span>
+        </button>
+        <button class="md-nav-item" id="nav-execution" onclick="openPage('execution')">
+          <span class="md-nav-icon">🕘</span><span class="md-nav-label">Ejecución</span>
+        </button>
+      </div>
+      <div class="md-sitemap-footer">
+        <button class="md-area-switcher" onclick="toggleAreaMenu(event)">
+          <span class="md-nav-label" id="area-switch-label">Priorización Renove</span><span>▴</span>
+        </button>
+        <div class="md-area-menu" id="area-menu">
+          <button onclick="selectArea('Priorización Renove')"><span class="dot">●</span>Priorización Renove</button>
+          <button onclick="selectArea('Acciones Proactivas')"><span class="dot" style="visibility:hidden">●</span>Acciones Proactivas</button>
+          <button onclick="selectArea('Detección de Anomalías')"><span class="dot" style="visibility:hidden">●</span>Detección de Anomalías</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===== Contenido ===== -->
+    <main class="md-content">
+      <div class="md-page-header">
+        <h1 id="page-title">Configuración</h1>
+        <p class="muted">Motor de scoring determinista y explicable. Configura los criterios, guarda versiones inmutables y revisa cada ejecución con el análisis posterior del agente.</p>
+      </div>
+
+      <!-- ================= VISTA 1 · CONFIGURACIÓN ================= -->
+      <div class="work-main" id="view-config">
+
+        <!-- 1 · Importar datos -->
+        <section class="panel run-controls">
+          <h2>1 · Importar datos</h2>
+          <label>Dataset (MRD)
+            <select>
+              <option selected>MRD 2026-07-09 · muestra anonimizada (12.480 filas)</option>
+              <option>MRD 2026-07-02 · muestra anonimizada</option>
+              <option>MRD 2026-06-25 · muestra anonimizada</option>
+              <option>Serie mock · data/mock_series (6 snapshots)</option>
+            </select>
+          </label>
+          <div class="row">
+            <label>Columna ID<input value="NU_TELEFONO_HASH" /></label>
+            <label>Columna fecha<input value="snapshot_date" /></label>
+            <label>Ventana<input type="number" value="4" min="1" /></label>
+          </div>
+          <button class="load-data-btn">Cargar y analizar datos</button>
+        </section>
+
+        <!-- Catálogo -->
+        <section class="panel catalog-panel">
+          <button class="catalog-panel-head" onclick="togglePanelBody(this)">
+            <span><span class="caret">▾</span> Catálogo de columnas</span>
+            <span class="chip">42</span>
+          </button>
+          <div class="panel-body">
+            <p class="muted">42 columnas agrupadas por campo.</p>
+            <div class="catalog-scroll">
+              <div class="catalog-group">
+                <button class="catalog-group-head" onclick="toggleGroup(this)">
+                  <span><span class="caret">▾</span> Calidad WiFi</span><span class="chip">4</span>
+                </button>
+                <ul class="catalog-list">
+                  <li>
+                    <div class="catalog-col-name">NUM_CORTES_WIFI_7D <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">Cortes de conectividad WiFi en los últimos 7 días</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">0% nulos</span><span class="metric">31 distintos</span>
+                      <span class="metric">mín 0 · med 2.84 · máx 41</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="catalog-col-name">PCT_HORAS_SATURACION <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">% de horas con el canal WiFi saturado (ventana 7 días)</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">2% nulos</span><span class="metric">812 distintos</span>
+                      <span class="metric">mín 0.00 · med 0.18 · máx 0.97</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="catalog-col-name">VEL_MEDIA_DESCARGA_MBPS <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">Velocidad media de descarga medida en cliente (Mbps)</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">1% nulos</span><span class="metric">2.410 distintos</span>
+                      <span class="metric">mín 3.20 · med 212.40 · máx 941.00</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="catalog-col-name">NUM_REINICIOS_ROUTER_30D <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">Reinicios del router (manuales + automáticos) en 30 días</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">0% nulos</span><span class="metric">24 distintos</span>
+                      <span class="metric">mín 0 · med 1.92 · máx 28</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="catalog-group">
+                <button class="catalog-group-head" onclick="toggleGroup(this)">
+                  <span><span class="caret">▸</span> Equipamiento</span><span class="chip">5</span>
+                </button>
+                <ul class="catalog-list hidden">
+                  <li>
+                    <div class="catalog-col-name">ANTIGUEDAD_ROUTER_MESES <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">Meses desde la instalación del router actual</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">0% nulos</span><span class="metric">96 distintos</span>
+                      <span class="metric">mín 1 · med 38.60 · máx 112</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="catalog-col-name">TIPO_ROUTER</div>
+                    <div class="catalog-col-desc">Modelo de router instalado en el hogar</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">0% nulos</span><span class="metric">6 distintos</span>
+                      <span class="metric metric-top">top: HGU_ASKEY (4.812) · HGU_MITRA (3.977) · ONT_SERCOMM (2.105)</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="catalog-group">
+                <button class="catalog-group-head" onclick="toggleGroup(this)">
+                  <span><span class="caret">▸</span> Averías y soporte</span><span class="chip">6</span>
+                </button>
+                <ul class="catalog-list hidden">
+                  <li>
+                    <div class="catalog-col-name">NUM_AVERIAS_90D <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">Averías abiertas en los últimos 90 días</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">0% nulos</span><span class="metric">9 distintos</span>
+                      <span class="metric">mín 0 · med 0.44 · máx 8</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="catalog-group">
+                <button class="catalog-group-head" onclick="toggleGroup(this)">
+                  <span><span class="caret">▸</span> Cliente y contrato</span><span class="chip">8</span>
+                </button>
+                <ul class="catalog-list hidden">
+                  <li>
+                    <div class="catalog-col-name">SEGMENTO</div>
+                    <div class="catalog-col-desc">Segmento comercial del cliente</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">0% nulos</span><span class="metric">3 distintos</span>
+                      <span class="metric metric-top">top: RESIDENCIAL (9.930) · PREMIUM (1.820) · SOHO (730)</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="catalog-col-name">CSAT_ULTIMO <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">Última nota de satisfacción declarada (1–10)</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">34% nulos</span><span class="metric">10 distintos</span>
+                      <span class="metric">mín 1 · med 7.10 · máx 10</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="catalog-group">
+                <button class="catalog-group-head" onclick="toggleGroup(this)">
+                  <span><span class="caret">▸</span> Cobertura y red</span><span class="chip">7</span>
+                </button>
+                <ul class="catalog-list hidden">
+                  <li>
+                    <div class="catalog-col-name">RSSI_MEDIO_DBM <span class="chip chip-num">num</span></div>
+                    <div class="catalog-col-desc">Potencia media de señal recibida por los dispositivos (dBm)</div>
+                    <div class="catalog-metrics">
+                      <span class="metric">3% nulos</span><span class="metric">58 distintos</span>
+                      <span class="metric">mín -92 · med -61.30 · máx -28</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2 · Librería de scorings -->
+        <section class="panel library-panel">
+          <div class="params-head"><h2>2 · Scoring: elegir, editar y ejecutar</h2></div>
+          <p class="muted">
+            Aplicando ahora: <strong>Renove Q3 · degradación WiFi</strong> · v3. Pulsa «Ejecutar» en
+            cualquier versión para aplicarla: verás su ranking y sus pesos en los editores de abajo,
+            listos para retocarlos y guardarlos como versión nueva. Las versiones guardadas nunca se modifican.
+          </p>
+          <div class="library-scroll">
+            <article class="library-item">
+              <header>
+                <span class="library-title">Por defecto (pesos iguales)</span>
+                <button class="ghost">Ejecutar</button>
+              </header>
+              <p class="library-digest">
+                Propuesta determinista del motor: reparte el peso entre las variables numéricas con
+                poder discriminante. Punto de partida para construir una configuración.
+              </p>
+            </article>
+
+            <article class="library-item is-active">
+              <header>
+                <button class="library-title" onclick="toggleVersions(this)">
+                  <span class="library-caret">▾</span>Renove Q3 · degradación WiFi
+                </button>
+                <span class="chip chip-champion">en producción</span>
+                <span class="chip">3 ver.</span>
+                <button class="ghost">Ejecutar de nuevo</button>
+              </header>
+              <p class="library-digest">
+                5 var. — NUM_CORTES_WIFI_7D 30% · ANTIGUEDAD_ROUTER_MESES 25% · PCT_HORAS_SATURACION 20% — +2 más — 1 categóricas — 2 filtros
+              </p>
+              <ul class="library-versions">
+                <li>
+                  <div class="library-version-head">
+                    <strong>v3</strong>
+                    <span class="chip chip-auto">propuesta LLM</span>
+                    <span class="muted">01/10/2026, 09:12 · analista-postrun</span>
+                    <span class="chip chip-champion">esta versión</span>
+                  </div>
+                  <p class="library-reason">Sube el peso de cortes WiFi: el seguimiento muestra que explican mejor la necesidad capturada que la saturación.</p>
+                  <p class="library-digest">5 var. — NUM_CORTES_WIFI_7D 30% · ANTIGUEDAD_ROUTER_MESES 25% · PCT_HORAS_SATURACION 20% — +2 más — 1 categóricas — 2 filtros</p>
+                  <div class="library-version-actions">
+                    <code title="hash de la configuración">a41f9c02be71</code>
+                    <button class="ghost">Ejecutar</button>
+                  </div>
+                </li>
+                <li>
+                  <div class="library-version-head">
+                    <strong>v2</strong>
+                    <span class="chip chip-manual">manual</span>
+                    <span class="muted">24/09/2026, 16:40 · g.jabat</span>
+                  </div>
+                  <p class="library-reason">Añade RSSI medio y excluye el parque SOHO a petición de negocio.</p>
+                  <p class="library-digest">5 var. — ANTIGUEDAD_ROUTER_MESES 28% · NUM_CORTES_WIFI_7D 25% · PCT_HORAS_SATURACION 22% — +2 más — 1 categóricas — 2 filtros</p>
+                  <div class="library-version-actions">
+                    <code title="hash de la configuración">7c20d84ab1f3</code>
+                    <button class="ghost">Ejecutar</button>
+                  </div>
+                </li>
+                <li>
+                  <div class="library-version-head">
+                    <strong>v1</strong>
+                    <span class="chip chip-manual">manual</span>
+                    <span class="muted">17/09/2026, 11:05 · g.jabat</span>
+                  </div>
+                  <p class="library-reason">Primera versión del scoring de degradación para el piloto Renove Q3.</p>
+                  <p class="library-digest">4 var. — ANTIGUEDAD_ROUTER_MESES 35% · NUM_CORTES_WIFI_7D 30% · PCT_HORAS_SATURACION 20% — +1 más</p>
+                  <div class="library-version-actions">
+                    <code title="hash de la configuración">31b7e5f9d044</code>
+                    <button class="ghost">Ejecutar</button>
+                  </div>
+                </li>
+              </ul>
+            </article>
+
+            <article class="library-item">
+              <header>
+                <button class="library-title" onclick="toggleVersions(this)">
+                  <span class="library-caret">▸</span>Solo averías recurrentes
+                </button>
+                <span class="chip">1 ver.</span>
+                <button class="ghost">Ejecutar</button>
+              </header>
+              <p class="library-digest">2 var. — NUM_AVERIAS_90D 60% · NUM_REINICIOS_ROUTER_30D 40% — 1 filtros</p>
+              <ul class="library-versions hidden">
+                <li>
+                  <div class="library-version-head">
+                    <strong>v1</strong>
+                    <span class="chip chip-manual">manual</span>
+                    <span class="muted">10/09/2026, 10:22 · p.soporte</span>
+                  </div>
+                  <p class="library-reason">Lista corta para la campaña de sustitución por averías.</p>
+                  <p class="library-digest">2 var. — NUM_AVERIAS_90D 60% · NUM_REINICIOS_ROUTER_30D 40% — 1 filtros</p>
+                  <div class="library-version-actions">
+                    <code title="hash de la configuración">e90ab5cc1208</code>
+                    <button class="ghost">Ejecutar</button>
+                  </div>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Configuraciones guardadas -->
+        <section class="panel scorings-panel">
+          <h2>Configuraciones guardadas</h2>
+          <p class="muted">
+            Marca la configuración que corre <strong>en producción</strong>: es la que se aplica
+            automáticamente a cada nuevo snapshot de MRD. Las configuraciones son inmutables: cada
+            cambio guarda una versión nueva.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>En producción</th><th>Nombre</th><th>Origen</th><th>ID / hash</th><th>Términos</th><th>Creado</th><th></th></tr>
+              </thead>
+              <tbody>
+                <tr class="row-champion">
+                  <td><label class="champion-radio"><input type="radio" name="champion" checked /></label></td>
+                  <td class="var-name">Renove Q3 · degradación WiFi <span class="chip">v3</span><span class="chip chip-champion">en producción</span></td>
+                  <td class="reasons">propuesta-llm</td>
+                  <td class="reasons">#cfg-renove-q3 · <code>a41f9c02be71</code></td>
+                  <td>6</td>
+                  <td class="reasons">2026-10-01</td>
+                  <td><button class="ghost danger" title="Eliminar configuración">✕</button></td>
+                </tr>
+                <tr>
+                  <td><label class="champion-radio"><input type="radio" name="champion" /></label></td>
+                  <td class="var-name">Renove Q3 · degradación WiFi <span class="chip">v2</span></td>
+                  <td class="reasons">manual</td>
+                  <td class="reasons">#cfg-renove-q3 · <code>7c20d84ab1f3</code></td>
+                  <td>6</td>
+                  <td class="reasons">2026-09-24</td>
+                  <td><button class="ghost danger" title="Eliminar configuración">✕</button></td>
+                </tr>
+                <tr>
+                  <td><label class="champion-radio"><input type="radio" name="champion" /></label></td>
+                  <td class="var-name">Solo averías recurrentes <span class="chip">v1</span></td>
+                  <td class="reasons">manual</td>
+                  <td class="reasons">#cfg-averias · <code>e90ab5cc1208</code></td>
+                  <td>2</td>
+                  <td class="reasons">2026-09-10</td>
+                  <td><button class="ghost danger" title="Eliminar configuración">✕</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Por qué este scoring -->
+        <section class="panel explanation-panel">
+          <h2>Por qué este scoring</h2>
+          <div class="explanation-meta">
+            <span class="chip chip-manual">Renove Q3 · degradación WiFi · v3</span>
+            <code title="hash de la fórmula">a41f9c02be71</code>
+            <span class="muted">5 variables · 1 categóricas · 2 filtros</span>
+          </div>
+          <p class="muted">
+            La puntuación 0–100 combina la degradación observada de la conexión (cortes, saturación,
+            señal), la antigüedad del equipo y el histórico de averías. El peso lo decide el analista;
+            el motor solo normaliza y recalcula de forma determinista.
+          </p>
+          <p class="report-text">Sube el peso de cortes WiFi: el seguimiento muestra que explican mejor la necesidad capturada que la saturación.</p>
+          <p class="muted">
+            Variables correlacionadas (pesar ambas duplica el mismo criterio):
+            NUM_CORTES_WIFI_7D ↔ NUM_REINICIOS_ROUTER_30D (r = 0.81) · PCT_HORAS_SATURACION ↔ VEL_MEDIA_DESCARGA_MBPS (r = −0.74)
+          </p>
+        </section>
+
+        <!-- 3 · Filtros -->
+        <section class="panel filters-panel">
+          <div class="params-head">
+            <h2>3 · Segmentación (filtros previos)</h2>
+            <button>Aplicar y ejecutar</button>
+          </div>
+          <p class="muted">
+            Los filtros deciden quién es <strong>elegible</strong> para el ranking; las métricas de
+            seguimiento se calculan siempre sobre el parque completo.
+          </p>
+          <div class="filter-list">
+            <div class="filter-row">
+              <select><option selected>SEGMENTO</option><option>TIPO_ROUTER</option><option>PROVINCIA</option></select>
+              <select><option selected>está en</option><option>no está en</option><option>igual a</option><option>distinto de</option></select>
+              <div class="filter-values">
+                <button class="chip-btn chip-on">RESIDENCIAL</button>
+                <button class="chip-btn chip-on">PREMIUM</button>
+                <button class="chip-btn">SOHO</button>
+              </div>
+              <button class="ghost danger">✕</button>
+            </div>
+            <div class="filter-row">
+              <select><option selected>TIPO_ROUTER</option><option>SEGMENTO</option><option>PROVINCIA</option></select>
+              <select><option selected>no está en</option><option>está en</option><option>igual a</option><option>distinto de</option></select>
+              <div class="filter-values">
+                <button class="chip-btn chip-on">HGU_2023_WIFI6</button>
+                <button class="chip-btn">HGU_ASKEY</button>
+                <button class="chip-btn">HGU_MITRA</button>
+                <button class="chip-btn">ONT_SERCOMM</button>
+              </div>
+              <button class="ghost danger">✕</button>
+            </div>
+          </div>
+          <button class="ghost">+ Añadir filtro</button>
+        </section>
+
+        <!-- 4 · Fórmula de ponderación -->
+        <section class="panel weights-panel">
+          <div class="params-head">
+            <h2>4 · Fórmula de ponderación</h2>
+            <button>Aplicar y ejecutar</button>
+          </div>
+          <div class="formula-preview">
+            <div class="formula-preview-title">Fórmula (puntuación 0–100)</div>
+            <div class="formula-preview-body">
+              <span class="fx-op">Σ</span>
+              <span class="fx-term"><span class="fx-weight">30.0%</span><span class="fx-times">·</span><span class="fx-var">NUM_CORTES_WIFI_7D</span><span class="fx-dir fx-higher">↑</span></span>
+              <span class="fx-term"><span class="fx-op">+</span><span class="fx-weight">25.0%</span><span class="fx-times">·</span><span class="fx-var">ANTIGUEDAD_ROUTER_MESES</span><span class="fx-dir fx-higher">↑</span></span>
+              <span class="fx-term"><span class="fx-op">+</span><span class="fx-weight">20.0%</span><span class="fx-times">·</span><span class="fx-var">PCT_HORAS_SATURACION</span><span class="fx-dir fx-higher">↑</span></span>
+              <span class="fx-term"><span class="fx-op">+</span><span class="fx-weight">10.0%</span><span class="fx-times">·</span><span class="fx-var">RSSI_MEDIO_DBM</span><span class="fx-dir fx-lower">↓</span></span>
+              <span class="fx-term"><span class="fx-op">+</span><span class="fx-weight">5.0%</span><span class="fx-times">·</span><span class="fx-var">NUM_AVERIAS_90D</span><span class="fx-dir fx-higher">↑</span></span>
+              <span class="fx-term"><span class="fx-op">+</span><span class="fx-weight">10.0%</span><span class="fx-times">·</span><span class="fx-var">TIPO_ROUTER</span><span class="fx-dir fx-cat">⋯</span></span>
+            </div>
+            <div class="muted formula-hint">
+              Cada variable numérica se normaliza a 0–1 (↓ menor es mejor, ↑ mayor es mejor); las
+              categóricas usan su mapa de valores. Los pesos se reescalan para sumar 100%.
+            </div>
+          </div>
+
+          <div class="add-var">
+            <input placeholder="Añadir variable… (36 disponibles)" />
+          </div>
+
+          <div class="weights-scroll">
+            <div class="weights-list">
+              <div class="weight-row">
+                <button class="ghost danger weight-remove" title="Quitar de la ponderación">✕</button>
+                <div class="weight-info">
+                  <div class="weight-name">NUM_CORTES_WIFI_7D</div>
+                  <div class="weight-desc">Cortes de conectividad WiFi en los últimos 7 días</div>
+                </div>
+                <label class="weight-field">Peso %<input class="mini" type="number" value="30" /></label>
+                <label class="weight-field">Dirección
+                  <select><option selected>mayor es mejor</option><option>menor es mejor</option></select>
+                </label>
+              </div>
+              <div class="weight-row">
+                <button class="ghost danger weight-remove" title="Quitar de la ponderación">✕</button>
+                <div class="weight-info">
+                  <div class="weight-name">ANTIGUEDAD_ROUTER_MESES</div>
+                  <div class="weight-desc">Meses desde la instalación del router actual</div>
+                </div>
+                <label class="weight-field">Peso %<input class="mini" type="number" value="25" /></label>
+                <label class="weight-field">Dirección
+                  <select><option selected>mayor es mejor</option><option>menor es mejor</option></select>
+                </label>
+              </div>
+              <div class="weight-row">
+                <button class="ghost danger weight-remove" title="Quitar de la ponderación">✕</button>
+                <div class="weight-info">
+                  <div class="weight-name">PCT_HORAS_SATURACION</div>
+                  <div class="weight-desc">% de horas con el canal WiFi saturado (ventana 7 días)</div>
+                </div>
+                <label class="weight-field">Peso %<input class="mini" type="number" value="20" /></label>
+                <label class="weight-field">Dirección
+                  <select><option selected>mayor es mejor</option><option>menor es mejor</option></select>
+                </label>
+              </div>
+              <div class="weight-row">
+                <button class="ghost danger weight-remove" title="Quitar de la ponderación">✕</button>
+                <div class="weight-info">
+                  <div class="weight-name">RSSI_MEDIO_DBM</div>
+                  <div class="weight-desc">Potencia media de señal recibida por los dispositivos (dBm)</div>
+                </div>
+                <label class="weight-field">Peso %<input class="mini" type="number" value="10" /></label>
+                <label class="weight-field">Dirección
+                  <select><option selected>menor es mejor</option><option>mayor es mejor</option></select>
+                </label>
+              </div>
+              <div class="weight-row">
+                <button class="ghost danger weight-remove" title="Quitar de la ponderación">✕</button>
+                <div class="weight-info">
+                  <div class="weight-name">NUM_AVERIAS_90D</div>
+                  <div class="weight-desc">Averías abiertas en los últimos 90 días</div>
+                </div>
+                <label class="weight-field">Peso %<input class="mini" type="number" value="5" /></label>
+                <label class="weight-field">Dirección
+                  <select><option selected>mayor es mejor</option><option>menor es mejor</option></select>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="subhead">Términos categóricos</h3>
+          <p class="muted">
+            Asigna a cada valor una necesidad de renovación (0 = nada, 1 = máxima) para incorporar
+            la columna a la fórmula.
+          </p>
+          <div class="cat-list">
+            <div class="cat-term">
+              <div class="cat-term-head">
+                <input type="checkbox" class="weight-check" checked />
+                <div class="weight-info">
+                  <div class="weight-name">TIPO_ROUTER</div>
+                  <div class="weight-desc">Modelo de router instalado en el hogar</div>
+                </div>
+                <label class="weight-field">Peso %<input class="mini" type="number" value="10" /></label>
+              </div>
+              <div class="cat-map">
+                <label class="cat-map-row"><span class="cat-value">HGU_ASKEY</span><input class="mini" type="number" value="0.8" step="0.1" /></label>
+                <label class="cat-map-row"><span class="cat-value">HGU_MITRA</span><input class="mini" type="number" value="0.7" step="0.1" /></label>
+                <label class="cat-map-row"><span class="cat-value">ONT_SERCOMM</span><input class="mini" type="number" value="0.5" step="0.1" /></label>
+                <label class="cat-map-row"><span class="cat-value">HGU_2021</span><input class="mini" type="number" value="0.3" step="0.1" /></label>
+                <label class="cat-map-row"><span class="cat-value">HGU_2023_WIFI6</span><input class="mini" type="number" value="0" step="0.1" /></label>
+              </div>
+            </div>
+            <div class="cat-term row-disabled">
+              <div class="cat-term-head">
+                <input type="checkbox" class="weight-check" />
+                <div class="weight-info">
+                  <div class="weight-name">SEGMENTO</div>
+                  <div class="weight-desc">Segmento comercial del cliente</div>
+                </div>
+                <label class="weight-field">Peso %<input class="mini" type="number" value="0" /></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5 · Guardar configuración -->
+        <section class="panel save-config">
+          <h2>5 · Guardar configuración</h2>
+          <p class="muted">
+            Las configuraciones son inmutables: guardar sobre una existente añade una versión nueva
+            sin tocar las anteriores. Promuévela a producción desde la pantalla de Ejecución para que
+            se aplique a los nuevos snapshots.
+          </p>
+          <div class="save-config-form">
+            <label>Guardar en
+              <select>
+                <option selected>Renove Q3 · degradación WiFi (v3)</option>
+                <option>Solo averías recurrentes (v1)</option>
+                <option>— Nueva configuración —</option>
+              </select>
+            </label>
+            <label>Nombre<input placeholder="Renove Q3 · degradación WiFi" /></label>
+            <label>Autor<input value="g.jabat" /></label>
+            <label>Justificación<input placeholder="Qué cambia y por qué" /></label>
+          </div>
+          <div class="panel-actions"><button>Guardar como versión 4</button></div>
+        </section>
+
+        <!-- QC -->
+        <section class="panel qc-panel">
+          <h2>Estado del run</h2>
+          <p class="muted">
+            Snapshots: 2026-06-25, 2026-07-02, 2026-07-09 · Clientes puntuados:
+            <strong>11.750</strong> · Excluidos (baja): 312
+          </p>
+          <div class="status-chips">
+            <span class="chip chip-activo">activo: 11.750</span>
+            <span class="chip chip-baja">baja: 312</span>
+            <span class="chip chip-alta">alta: 418</span>
+          </div>
+          <div class="gate gate-ok"><strong>Calidad: PASS</strong></div>
+          <div class="gate gate-ok">
+            <strong>Validación: PASS</strong>
+            <ul><li>CSAT_ULTIMO con 34% de nulos: imputado a la mediana del segmento.</li></ul>
+          </div>
+          <div class="publishable yes">✔ Ranking publicable</div>
+        </section>
+
+        <!-- 6 · Ranking -->
+        <section class="panel ranking-panel">
+          <div class="params-head">
+            <h2>6 · Ranking de renovación</h2>
+            <a class="export-link" href="#">⬇ Exportar CSV</a>
+          </div>
+          <p class="muted">11.750 clientes puntuados</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>#</th><th>NU_TELEFONO_HASH</th><th>Estado</th><th>Score</th><th>Motivos</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td class="var-name">9f3a71c2e8b4d016</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:92.4%"></div><span>92.41</span></div></td>
+                  <td class="reasons">CORTES_ALTOS · ROUTER_ANTIGUO · SATURACION</td></tr>
+                <tr><td>2</td><td class="var-name">4be09d55a127f3c8</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:89.7%"></div><span>89.73</span></div></td>
+                  <td class="reasons">ROUTER_ANTIGUO · SEÑAL_DEBIL</td></tr>
+                <tr><td>3</td><td class="var-name">c21e86f4903ba57d</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:87.1%"></div><span>87.12</span></div></td>
+                  <td class="reasons">CORTES_ALTOS · AVERIAS_RECURRENTES</td></tr>
+                <tr><td>4</td><td class="var-name">77d2ab1904ce5f6e</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:84.8%"></div><span>84.80</span></div></td>
+                  <td class="reasons">SATURACION · ROUTER_ANTIGUO</td></tr>
+                <tr><td>5</td><td class="var-name">e5f8c0317d2496ab</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:82.3%"></div><span>82.29</span></div></td>
+                  <td class="reasons">CORTES_ALTOS · SEÑAL_DEBIL · MODELO_OBSOLETO</td></tr>
+                <tr><td>6</td><td class="var-name">0a94de62b17c38f5</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:80.6%"></div><span>80.57</span></div></td>
+                  <td class="reasons">ROUTER_ANTIGUO</td></tr>
+                <tr><td>7</td><td class="var-name">b36c15f7e9d4802a</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:78.9%"></div><span>78.94</span></div></td>
+                  <td class="reasons">SATURACION · MODELO_OBSOLETO</td></tr>
+                <tr><td>8</td><td class="var-name">6d08f23ac5b19e74</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:77.2%"></div><span>77.18</span></div></td>
+                  <td class="reasons">CORTES_ALTOS</td></tr>
+                <tr><td>9</td><td class="var-name">f1c4a98b02e6d753</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:75.5%"></div><span>75.46</span></div></td>
+                  <td class="reasons">SEÑAL_DEBIL · AVERIAS_RECURRENTES</td></tr>
+                <tr><td>10</td><td class="var-name">28e7b60d94f1c3a5</td><td><span class="chip chip-activo">activo</span></td>
+                  <td><div class="score-cell"><div class="score-bar" style="width:74.1%"></div><span>74.08</span></div></td>
+                  <td class="reasons">ROUTER_ANTIGUO · SATURACION</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <button disabled>← Anterior</button>
+            <span>Página 1 / 235</span>
+            <button>Siguiente →</button>
+          </div>
+        </section>
+
+        <!-- 7 · Guardar análisis -->
+        <section class="panel push-panel">
+          <h2>7 · Guardar análisis</h2>
+          <p class="muted">
+            Exporta el resultado con <code>run_id</code> y hash de fórmula para trazabilidad
+            (futuro: base de datos).
+          </p>
+          <div class="push-row">
+            <input value="data/out" placeholder="carpeta destino" />
+            <button>Guardar</button>
+          </div>
+          <div class="push-result">
+            <div>CSV: <code>data/out/ranking_run-20261007-0901_a41f9c02.csv</code></div>
+            <div>Manifiesto: <code>data/out/ranking_run-20261007-0901_a41f9c02.manifest.json</code></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= VISTA 2 · EJECUCIÓN ================= -->
+      <div class="work-main hidden" id="view-execution">
+
+        <!-- Log de ejecuciones -->
+        <section class="panel runs-panel">
+          <div class="params-head row-head">
+            <h2>Ejecuciones</h2>
+            <button>Simular llegada de snapshot</button>
+            <button class="ghost">Actualizar</button>
+          </div>
+          <p class="muted">
+            Cada ejecución queda registrada con los snapshots que leyó (y su hash), la configuración
+            que la puntuó y el resultado del control de calidad. «Simular llegada de snapshot»
+            deposita un MRD nuevo derivado del último en la carpeta vigilada: el servicio lo detecta
+            solo, puntúa con la configuración en producción y redacta el análisis.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>Fecha</th><th>Origen</th><th>Snapshots</th><th>Configuración</th><th>Calidad</th><th>Clientes</th><th>Eficiencia</th><th>Cobertura</th><th>Análisis</th><th></th></tr>
+              </thead>
+              <tbody>
+                <tr class="row-champion">
+                  <td class="reasons">2026-10-07 08:40:12</td>
+                  <td><span class="chip chip-auto">automática</span></td>
+                  <td class="reasons">2026-07-02, 2026-07-09, 2026-07-16</td>
+                  <td class="reasons">Renove Q3 · degradación WiFi v3 · <code>a41f9c02</code></td>
+                  <td class="delta-down">✔ ok</td>
+                  <td>11.812</td><td>78%</td><td>64%</td>
+                  <td class="reasons">sí</td>
+                  <td><button class="ghost">Ver</button><a class="ghost" href="#">CSV</a></td>
+                </tr>
+                <tr>
+                  <td class="reasons">2026-09-30 08:35:44</td>
+                  <td><span class="chip chip-auto">automática</span></td>
+                  <td class="reasons">2026-06-25, 2026-07-02, 2026-07-09</td>
+                  <td class="reasons">Renove Q3 · degradación WiFi v2 · <code>7c20d84a</code></td>
+                  <td class="delta-down">✔ ok</td>
+                  <td>11.750</td><td>71%</td><td>58%</td>
+                  <td class="reasons">sí</td>
+                  <td><button class="ghost">Ver</button><a class="ghost" href="#">CSV</a></td>
+                </tr>
+                <tr>
+                  <td class="reasons">2026-09-24 17:02:08</td>
+                  <td><span class="chip chip-manual">manual</span></td>
+                  <td class="reasons">2026-06-25, 2026-07-02, 2026-07-09</td>
+                  <td class="reasons">ad hoc · <code>51bc0e77</code></td>
+                  <td class="delta-up">✕ 2 incidencia(s)</td>
+                  <td>11.750</td><td>—</td><td>—</td>
+                  <td class="reasons">—</td>
+                  <td><button class="ghost">Ver</button></td>
+                </tr>
+                <tr>
+                  <td class="reasons">2026-09-23 08:31:19</td>
+                  <td><span class="chip chip-auto">automática</span></td>
+                  <td class="reasons">2026-06-18, 2026-06-25, 2026-07-02</td>
+                  <td class="reasons">Renove Q3 · degradación WiFi v2 · <code>7c20d84a</code></td>
+                  <td class="delta-down">✔ ok</td>
+                  <td>11.694</td><td>69%</td><td>55%</td>
+                  <td class="reasons">sí</td>
+                  <td><button class="ghost">Ver</button><a class="ghost" href="#">CSV</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Detalle del run -->
+        <section class="panel run-detail">
+          <div class="params-head row-head">
+            <h2>Ejecución run-20261007-0840</h2>
+            <div class="proposal-actions">
+              <button>Analizar de nuevo</button>
+              <button class="ghost">Cerrar</button>
+            </div>
+          </div>
+          <p class="muted">
+            Automática · 2026-10-07 08:40:12 · Renove Q3 · degradación WiFi v3 ·
+            receta <code>a41f9c02be71</code>
+          </p>
+
+          <h4>Datos leídos</h4>
+          <ul class="reasons">
+            <li>2026-07-16 — data/mrd/mrd_20260716.csv · <code>3fd8a21c90e4</code></li>
+            <li>2026-07-09 — data/mrd/mrd_20260709.csv · <code>b7410cd2e85f</code></li>
+            <li>2026-07-02 — data/mrd/mrd_20260702.csv · <code>19ce57a4b230</code></li>
+          </ul>
+
+          <h4>Calidad</h4>
+          <p class="muted">Sin incidencias.</p>
+
+          <h4>Rendimiento de la lista (presupuesto 500 equipos)</h4>
+          <p class="muted">
+            Eficiencia <strong>78%</strong> — 100% sería la mejor lista posible de 500 clientes y
+            0% no distinguirse del azar.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Selección</th><th>Necesidad capturada</th></tr></thead>
+              <tbody>
+                <tr><td>Óptimo retrospectivo</td><td>41.230</td></tr>
+                <tr><td><strong>Esta lista</strong></td><td><strong>33.890</strong></td></tr>
+                <tr><td>Al azar</td><td>7.610</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="muted">
+            Necesidad media de los elegidos 67.8 frente a 15.2 del parque completo (11.812 clientes).
+          </p>
+
+          <h4>Qué pasó con la lista anterior</h4>
+          <p class="muted">
+            De las 180 renovaciones hechas, 115 salieron de aquella lista
+            (<strong>64%</strong> de cobertura); se atendió el 23% de lo que pedimos.
+          </p>
+          <p class="muted">
+            Los priorizados bajaron su necesidad 18.4 puntos frente a 6.1 del resto de renovados:
+            ventaja de <strong>12.3</strong> puntos.
+          </p>
+          <p class="muted">Medido con la métrica de referencia ref-metric-v1 (anclada a 2026-06-18).</p>
+
+          <h4>Efecto de la renovación (KPIs de negocio)</h4>
+          <p class="muted">
+            Equipos renovados frente a un control emparejado por score entre los snapshots
+            2026-07-09 → 2026-07-16. Diferencia de diferencias del índice de necesidad:
+            <strong>12.3</strong> puntos a favor de la renovación.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>KPI</th><th>Renovados</th><th>Control</th><th>Objetivo</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="var-name">Retención<br /><span class="muted">% bajas</span></td>
+                  <td>1% bajas · 115 equipos</td><td>4% bajas · 115 equipos</td>
+                  <td class="muted">&lt; control</td><td class="delta-down">✔ Cumplido</td>
+                </tr>
+                <tr>
+                  <td class="var-name">Efectividad técnica<br /><span class="muted">cortes / 7 días</span></td>
+                  <td>6.80 → 1.20 (−82%)</td><td>6.40 → 5.90 (−8%)</td>
+                  <td class="muted">−50%</td><td class="delta-down">✔ Cumplido</td>
+                </tr>
+                <tr>
+                  <td class="var-name">Averías<br /><span class="muted">tickets / 90 días</span></td>
+                  <td>1.40 → 0.30 (−79%)</td><td>1.30 → 1.10 (−15%)</td>
+                  <td class="muted">−30%</td><td class="delta-down">✔ Cumplido</td>
+                </tr>
+                <tr>
+                  <td class="var-name">Satisfacción<br /><span class="muted">CSAT 1–10</span></td>
+                  <td>5.90 → 7.40 (+25%)</td><td>6.10 → 6.20 (+2%)</td>
+                  <td class="muted">+1 punto</td><td class="delta-down">✔ Cumplido</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="muted">Medido con la métrica de referencia ref-metric-v1.</p>
+
+          <h4>Análisis</h4>
+          <pre class="report-text">## Revisión del run run-20261007-0840
+
+La lista capturó el 78% de la necesidad máxima alcanzable con 500 equipos, 7 puntos por
+encima del run anterior. La cobertura de la lista previa fue del 64%: dos de cada tres
+renovaciones ejecutadas salieron del ranking publicado.
+
+**Lo que funciona.** NUM_CORTES_WIFI_7D sigue siendo el término con mayor aportación a la
+necesidad capturada; el filtro que excluye HGU_2023_WIFI6 evita gastar presupuesto en
+equipos ya renovados.
+
+**Margen de mejora.** RSSI_MEDIO_DBM apenas discrimina dentro del top-500 (varianza
+normalizada 0.03). Reasignar parte de su peso a PCT_HORAS_SATURACION podría elevar la
+eficiencia estimada en ~2 puntos sin tocar los filtros.</pre>
+          <p class="muted">Fuente: modelo</p>
+          <div class="proposal">
+            <div class="proposal-head"><strong>Propuesta de repesado</strong></div>
+            <p class="reasons">
+              RSSI medio no separa a los candidatos del top-500; trasladar 5 puntos de su peso a la
+              saturación mantiene la fórmula explicable y mejora la necesidad capturada estimada.
+            </p>
+            <ul class="proposal-terms">
+              <li>NUM_CORTES_WIFI_7D: 30%</li>
+              <li>ANTIGUEDAD_ROUTER_MESES: 25%</li>
+              <li>PCT_HORAS_SATURACION: 25%</li>
+              <li>RSSI_MEDIO_DBM: 5%</li>
+              <li>NUM_AVERIAS_90D: 5%</li>
+              <li>TIPO_ROUTER: 10%</li>
+            </ul>
+            <div class="proposal-actions">
+              <input class="proposal-name" placeholder="Nombre de la nueva versión" />
+              <button>Aceptar como nueva versión</button>
+            </div>
+            <p class="muted">
+              Se guarda como versión nueva de la configuración; no pasa a producción hasta que la
+              marques como tal.
+            </p>
+          </div>
+        </section>
+
+        <!-- Seguimiento -->
+        <section class="panel followup-panel">
+          <div class="params-head row-head">
+            <h2>Seguimiento del snapshot</h2>
+            <button>Evaluar nuevo snapshot</button>
+          </div>
+          <p class="muted">
+            Al llegar un nuevo snapshot, además de recalcular el ranking con el scoring en
+            producción, la IA revisa si la renovación mejoró los cuatro KPIs de negocio (retención,
+            efectividad técnica, averías y satisfacción) frente a un control comparable. Si el
+            control mejora casi igual, la mejora no se explica por el renove y conviene revisar el
+            scoring.
+          </p>
+          <div class="gate gate-ok">
+            <strong>✔ Renovación efectiva</strong> · confianza 86% · IA
+          </div>
+          <p class="followup-reasoning">
+            Los cuatro KPIs objetivo mejoran en la cohorte renovada muy por encima del control
+            emparejado por score: los cortes caen un 82% frente al 8% del control y la satisfacción
+            sube 1,5 puntos frente a 0,1. La diferencia de diferencias del índice de necesidad
+            (12,3 puntos) confirma que la mejora se explica por la renovación y no por regresión a
+            la media. No hay señales que exijan revisar el scoring en producción.
+          </p>
+          <p class="muted">
+            Diferencia de diferencias del índice de necesidad (Δcontrol − Δrenovados):
+            <strong>12.3</strong> puntos · control emparejado por score (descuenta la regresión a la
+            media) · snapshots comparados: 2026-07-09 → 2026-07-16 · scoring: Renove Q3 ·
+            degradación WiFi
+          </p>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<span class="mock-badge">MOCK ESTÁTICO · sin backend</span>
+
+<script>
+function toggleNav() {
+  document.getElementById("sitemap").classList.toggle("collapsed");
+}
+function openPage(id) {
+  document.getElementById("view-config").classList.toggle("hidden", id !== "config");
+  document.getElementById("view-execution").classList.toggle("hidden", id !== "execution");
+  document.getElementById("nav-config").classList.toggle("selected", id === "config");
+  document.getElementById("nav-execution").classList.toggle("selected", id === "execution");
+  document.getElementById("page-title").textContent = id === "config" ? "Configuración" : "Ejecución";
+  document.querySelector(".md-content").scrollTop = 0;
+}
+function toggleAreaMenu(ev) {
+  ev.stopPropagation();
+  document.getElementById("area-menu").classList.toggle("open");
+}
+function selectArea(label) {
+  document.getElementById("area-switch-label").textContent = label;
+  document.getElementById("topbar-area").textContent = label;
+  document.getElementById("area-menu").classList.remove("open");
+}
+document.addEventListener("click", () => document.getElementById("area-menu").classList.remove("open"));
+function toggleGroup(btn) {
+  const list = btn.nextElementSibling;
+  const caret = btn.querySelector(".caret");
+  const hidden = list.classList.toggle("hidden");
+  caret.textContent = hidden ? "▸" : "▾";
+}
+function togglePanelBody(btn) {
+  const body = btn.parentElement.querySelector(".panel-body");
+  const caret = btn.querySelector(".caret");
+  const hidden = body.classList.toggle("hidden");
+  caret.textContent = hidden ? "▸" : "▾";
+}
+function toggleVersions(btn) {
+  const item = btn.closest(".library-item");
+  const list = item.querySelector(".library-versions");
+  if (!list) return;
+  const caret = btn.querySelector(".library-caret");
+  const hidden = list.classList.toggle("hidden");
+  caret.textContent = hidden ? "▸" : "▾";
+}
+</script>
+</body>
+</html>
