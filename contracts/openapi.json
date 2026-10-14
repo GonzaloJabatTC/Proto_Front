@@ -1,0 +1,3155 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "agent-gestion-proactiva",
+    "description": "Agente de Gestión Proactiva — ranking Renove WiFi",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "summary": "Liveness and readiness",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/.well-known/agent-card.json": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Agent card generated at runtime",
+        "operationId": "agent_card_api__well_known_agent_card_json_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Agent Card Api  Well Known Agent Card Json Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/responses": {
+      "post": {
+        "tags": [
+          "renove:agent"
+        ],
+        "summary": "Invoke the agent and wait for the full answer",
+        "operationId": "create_response_api_renove_responses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvokeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvokeResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/run": {
+      "post": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Run the scoring pipeline over MRD snapshots",
+        "operationId": "run_pipeline_api_renove_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Run Pipeline Api Renove Run Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/parameters": {
+      "get": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Chosen variables, weights and justification",
+        "operationId": "get_parameters_api_renove_parameters_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Parameters Api Renove Parameters Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/weights": {
+      "post": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Adjust weights/directions and recompute (no LLM)",
+        "operationId": "adjust_weights_api_renove_weights_post",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeightsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Adjust Weights Api Renove Weights Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/ranking": {
+      "get": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Paged renovation shortlist",
+        "operationId": "get_ranking_api_renove_ranking_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Ranking Api Renove Ranking Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/qc": {
+      "get": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Quality, validation and statistics report",
+        "operationId": "get_qc_api_renove_qc_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Qc Api Renove Qc Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/catalog": {
+      "get": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Column catalog grouped by field, with descriptions",
+        "description": "Return the MRD column catalog (data types + derived groups/descriptions).",
+        "operationId": "get_catalog_api_renove_catalog_get",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CatalogColumnInfo"
+                  },
+                  "title": "Response Get Catalog Api Renove Catalog Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/profile": {
+      "get": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Per-column statistics profiled from the loaded snapshot",
+        "description": "Profile the selected dataset (nulls, distinct, ranges, top values).\n\nFeeds the column catalog metrics and the filter value pickers. Reads the\nsingle latest snapshot; results are cached per (file, mtime).",
+        "operationId": "get_profile_api_renove_profile_get",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ColumnProfile"
+                  },
+                  "title": "Response Get Profile Api Renove Profile Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/export": {
+      "post": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Write the ranking to a decision CSV",
+        "operationId": "export_ranking_api_renove_export_post",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/push": {
+      "post": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Persist a traceable analysis (CSV + manifest) to a path",
+        "operationId": "push_analysis_api_renove_push_post",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Push Analysis Api Renove Push Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/datasets": {
+      "get": {
+        "tags": [
+          "renove:scoring"
+        ],
+        "summary": "Discover selectable snapshot sources under data/",
+        "description": "List snapshot files (and folders holding them) under ``data/``.",
+        "operationId": "list_datasets_api_renove_datasets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DatasetInfo"
+                  },
+                  "type": "array",
+                  "title": "Response List Datasets Api Renove Datasets Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/catalogo/variables": {
+      "get": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Catálogo de variables (contrato frontend)",
+        "operationId": "list_variables_api_renove_catalogo_variables_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response List Variables Api Renove Catalogo Variables Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Alta de variable del catálogo",
+        "operationId": "create_variable_api_renove_catalogo_variables_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Create Variable Api Renove Catalogo Variables Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/catalogo/variables/{variable_id}": {
+      "patch": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Edición parcial de una variable",
+        "operationId": "update_variable_api_renove_catalogo_variables__variable_id__patch",
+        "parameters": [
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Variable Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/configuraciones": {
+      "get": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Librería de configuraciones (contrato frontend)",
+        "operationId": "list_configuraciones_api_renove_configuraciones_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response List Configuraciones Api Renove Configuraciones Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Nueva configuración (linaje nuevo)",
+        "operationId": "create_configuracion_api_renove_configuraciones_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Create Configuracion Api Renove Configuraciones Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/configuraciones/{version_id}/versiones": {
+      "post": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Nueva versión dentro del linaje",
+        "operationId": "create_version_api_renove_configuraciones__version_id__versiones_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Create Version Api Renove Configuraciones  Version Id  Versiones Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/configuraciones/{version_id}/produccion": {
+      "post": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Promocionar una versión a champion",
+        "operationId": "promote_version_api_renove_configuraciones__version_id__produccion_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/configuraciones/{version_id}": {
+      "patch": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Editar la descripción (único campo mutable)",
+        "operationId": "patch_configuracion_api_renove_configuraciones__version_id__patch",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/ejecuciones": {
+      "get": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Historial de ejecuciones (contrato frontend)",
+        "operationId": "list_ejecuciones_api_renove_ejecuciones_get",
+        "parameters": [
+          {
+            "name": "configuracion_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Configuracion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response List Ejecuciones Api Renove Ejecuciones Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/ejecuciones/{run_id}/ranking": {
+      "get": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Top-K publicado de una ejecución",
+        "operationId": "get_run_ranking_api_renove_ejecuciones__run_id__ranking_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response Get Run Ranking Api Renove Ejecuciones  Run Id  Ranking Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/snapshots/{snapshot_id}": {
+      "get": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Metadatos del snapshot de una ejecución",
+        "operationId": "get_snapshot_api_renove_snapshots__snapshot_id__get",
+        "parameters": [
+          {
+            "name": "snapshot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Snapshot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Snapshot Api Renove Snapshots  Snapshot Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/snapshots/{snapshot_id}/csv": {
+      "get": {
+        "tags": [
+          "renove:frontend"
+        ],
+        "summary": "Descarga del CSV original del snapshot",
+        "operationId": "download_snapshot_csv_api_renove_snapshots__snapshot_id__csv_get",
+        "parameters": [
+          {
+            "name": "snapshot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Snapshot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/scorings": {
+      "get": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "List scoring configuration versions and the champion",
+        "operationId": "list_scorings_api_renove_scorings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Append a scoring configuration version",
+        "description": "Persist a configuration. Saved versions are immutable: this always appends.",
+        "operationId": "save_scoring_api_renove_scorings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveScoringRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedScoringInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/scorings/champion": {
+      "post": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Promote a configuration version to champion",
+        "operationId": "set_champion_api_renove_scorings_champion_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChampionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/scorings/{config_id}": {
+      "delete": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Delete a whole configuration lineage",
+        "operationId": "delete_scoring_api_renove_scorings__config_id__delete",
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Config Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/runs": {
+      "get": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "List recorded scoring runs (newest first)",
+        "description": "Every run ever executed, including fail-closed ones (no ranking).",
+        "operationId": "list_runs_api_renove_runs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Full traceability record of a run",
+        "operationId": "get_run_api_renove_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/runs/{run_id}/export": {
+      "get": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Download the ranking CSV of a run",
+        "operationId": "export_run_api_renove_runs__run_id__export_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/runs/{run_id}/analysis": {
+      "post": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Run the post-run LLM review of a run",
+        "description": "One-shot review: report + optional re-weighting proposal. Never applies it.",
+        "operationId": "analyze_run_endpoint_api_renove_runs__run_id__analysis_post",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunAnalysis"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/runs/{run_id}/analysis/accept": {
+      "post": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Accept a proposal as a new config version",
+        "description": "Turn the stored proposal into a **new immutable version** (D3).\n\nThis is the only path from proposal to library: nothing is ever applied\nautomatically, and no saved plan is mutated.",
+        "operationId": "accept_proposal_api_renove_runs__run_id__analysis_accept_post",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptProposalRequest",
+                "default": {
+                  "name": "",
+                  "description": "",
+                  "author": ""
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedScoringInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/followup/evaluate": {
+      "post": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Evaluate post-renovation follow-up for a new snapshot",
+        "description": "Build the deterministic follow-up summary and return an LLM/fallback verdict.\n\nUses the two newest MRD snapshots (``source=\"snapshots\"``). When fewer than\ntwo are available the synthetic provider takes over, seeded from the\nconfiguration's plan hash so the evaluation stays reproducible.",
+        "operationId": "followup_evaluate_api_renove_followup_evaluate_post",
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Config Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowupEvaluation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/renove/snapshots/simulate": {
+      "post": {
+        "tags": [
+          "renove:production"
+        ],
+        "summary": "Stage a simulated MRD snapshot arrival",
+        "description": "Write one derived snapshot into the watched folder and let the watcher act.\n\nThis endpoint deliberately does **not** run the scoring itself: the point is\nto reproduce the real sequence (a file lands -> the watcher notices -> the\nproduction configuration is scored and analysed), so what is demonstrated is\nthe actual production path and not a shortcut. It writes into ``data/``, so\nit is refused unless ``MOCK__ENABLED`` is on.\n\nMost of the simulated renovations are taken from the shortlist of the last\nrecorded run: field acts on the list we published, and without that link the\ncoverage and lift metrics of the next cycle would have nothing to grade.",
+        "operationId": "simulate_snapshot_api_renove_snapshots_simulate_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulatedSnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/acciones/status": {
+      "get": {
+        "summary": "Estado de la iniciativa",
+        "operationId": "status_api_acciones_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Status Api Acciones Status Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/anomalias/status": {
+      "get": {
+        "summary": "Estado de la iniciativa",
+        "operationId": "status_api_anomalias_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Status Api Anomalias Status Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AcceptProposalRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name for the new version; defaults to the run's.",
+            "default": ""
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Defaults to the proposal rationale.",
+            "default": ""
+          },
+          "author": {
+            "type": "string",
+            "title": "Author",
+            "description": "Who accepted the proposal.",
+            "default": ""
+          },
+          "config_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Id",
+            "description": "Lineage to append to; defaults to the run's configuration."
+          }
+        },
+        "type": "object",
+        "title": "AcceptProposalRequest",
+        "description": "Body accepted by ``POST /api/runs/{run_id}/analysis/accept``."
+      },
+      "CatalogColumnInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "group": {
+            "type": "string",
+            "title": "Group"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "data_type": {
+            "type": "string",
+            "title": "Data Type"
+          },
+          "is_numeric": {
+            "type": "boolean",
+            "title": "Is Numeric"
+          },
+          "default_direction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Direction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "group",
+          "description",
+          "data_type",
+          "is_numeric"
+        ],
+        "title": "CatalogColumnInfo",
+        "description": "Derived, human-facing metadata for one MRD column."
+      },
+      "CategoricalRule": {
+        "properties": {
+          "column": {
+            "type": "string",
+            "title": "Column",
+            "description": "Non-numeric column to score."
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight",
+            "description": "Relative weight (re-normalized).",
+            "default": 0.0
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Whether it participates.",
+            "default": false
+          },
+          "mapping": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Mapping",
+            "description": "Value -> need in [0,1]."
+          },
+          "default": {
+            "type": "number",
+            "title": "Default",
+            "description": "Need for unmapped values.",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "column"
+        ],
+        "title": "CategoricalRule",
+        "description": "One categorical term folded into the weighted sum via a value->need map."
+      },
+      "ChampionPointer": {
+        "properties": {
+          "config_id": {
+            "type": "string",
+            "title": "Config Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "config_id",
+          "version"
+        ],
+        "title": "ChampionPointer",
+        "description": "Which stored version production applies automatically."
+      },
+      "ChampionRequest": {
+        "properties": {
+          "config_id": {
+            "type": "string",
+            "title": "Config Id",
+            "description": "Lineage to promote."
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version",
+            "description": "Version to promote; defaults to the latest."
+          }
+        },
+        "type": "object",
+        "required": [
+          "config_id"
+        ],
+        "title": "ChampionRequest",
+        "description": "Body accepted by ``POST /api/scorings/champion``."
+      },
+      "ColumnProfile": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "dtype": {
+            "type": "string",
+            "title": "Dtype"
+          },
+          "is_string": {
+            "type": "boolean",
+            "title": "Is String"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "description": "'numeric' (incremental) or 'categorical'."
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "null_count": {
+            "type": "integer",
+            "title": "Null Count"
+          },
+          "null_pct": {
+            "type": "number",
+            "title": "Null Pct"
+          },
+          "distinct": {
+            "type": "integer",
+            "title": "Distinct"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min"
+          },
+          "mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          },
+          "top": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TopValue"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values",
+            "description": "Bounded distinct values for string filter pickers."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "dtype",
+          "is_string",
+          "kind",
+          "count",
+          "null_count",
+          "null_pct",
+          "distinct"
+        ],
+        "title": "ColumnProfile",
+        "description": "Per-column statistics profiled from the loaded snapshot."
+      },
+      "DatasetInfo": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "path",
+          "kind"
+        ],
+        "title": "DatasetInfo",
+        "description": "One selectable snapshot source under the data directory."
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "title": "Error"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "description": "Error envelope; always carries the ``trace_id`` for correlation."
+      },
+      "FilterRule": {
+        "properties": {
+          "column": {
+            "type": "string",
+            "title": "Column",
+            "description": "Any MRD column (numeric or categorical)."
+          },
+          "op": {
+            "type": "string",
+            "title": "Op",
+            "description": "in|not_in|eq|ne|gte|lte|gt|lt"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Values",
+            "description": "Comparison value(s)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "column",
+          "op"
+        ],
+        "title": "FilterRule",
+        "description": "One pre-scoring row filter: keep rows where ``column op values`` holds."
+      },
+      "FollowupCohortInfo": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "score_before": {
+            "type": "number",
+            "title": "Score Before"
+          },
+          "score_after": {
+            "type": "number",
+            "title": "Score After"
+          },
+          "delta": {
+            "type": "number",
+            "title": "Delta"
+          },
+          "pct_improved": {
+            "type": "number",
+            "title": "Pct Improved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "count",
+          "score_before",
+          "score_after",
+          "delta",
+          "pct_improved"
+        ],
+        "title": "FollowupCohortInfo",
+        "description": "Score evolution of one device cohort between snapshots."
+      },
+      "FollowupEvaluation": {
+        "properties": {
+          "config_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Id"
+          },
+          "config_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Version"
+          },
+          "scoring_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scoring Name"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/FollowupSummaryInfo"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/FollowupVerdictInfo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "summary",
+          "verdict"
+        ],
+        "title": "FollowupEvaluation",
+        "description": "Body returned by ``POST /api/followup/evaluate``."
+      },
+      "FollowupSummaryInfo": {
+        "properties": {
+          "snapshots": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Snapshots"
+          },
+          "renovated": {
+            "$ref": "#/components/schemas/FollowupCohortInfo"
+          },
+          "control": {
+            "$ref": "#/components/schemas/FollowupCohortInfo"
+          },
+          "attribution_gap": {
+            "type": "number",
+            "title": "Attribution Gap"
+          },
+          "reason_persistence": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Reason Persistence"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "kpi_deltas": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Kpi Deltas"
+          },
+          "control_kpi_deltas": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Control Kpi Deltas"
+          },
+          "retention": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Retention"
+          },
+          "scorecard": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Scorecard"
+          }
+        },
+        "type": "object",
+        "required": [
+          "snapshots",
+          "renovated",
+          "control",
+          "attribution_gap",
+          "source"
+        ],
+        "title": "FollowupSummaryInfo",
+        "description": "Deterministic follow-up aggregates."
+      },
+      "FollowupVerdictInfo": {
+        "properties": {
+          "verdict": {
+            "type": "string",
+            "title": "Verdict",
+            "description": "'bueno' | 'revisar'"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "reasoning": {
+            "type": "string",
+            "title": "Reasoning"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "'llm' | 'fallback'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "verdict",
+          "confidence",
+          "reasoning",
+          "source"
+        ],
+        "title": "FollowupVerdictInfo",
+        "description": "LLM (or fallback) verdict on whether the renovation is paying off."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "agent": {
+            "type": "string",
+            "title": "Agent"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "runtime": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Runtime"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "agent",
+          "version"
+        ],
+        "title": "HealthResponse",
+        "description": "Body returned by ``/api/health``."
+      },
+      "InvokeRequest": {
+        "properties": {
+          "input": {
+            "type": "string",
+            "title": "Input",
+            "description": "User message or instruction."
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata",
+            "description": "Free-form client metadata."
+          }
+        },
+        "type": "object",
+        "required": [
+          "input"
+        ],
+        "title": "InvokeRequest",
+        "description": "Body accepted by ``/api/responses``."
+      },
+      "InvokeResponse": {
+        "properties": {
+          "output": {
+            "title": "Output"
+          },
+          "trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Id"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "output"
+        ],
+        "title": "InvokeResponse",
+        "description": "Body returned by ``/api/responses``."
+      },
+      "PushRequest": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path",
+            "description": "Target folder or .csv file path."
+          }
+        },
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "title": "PushRequest",
+        "description": "Body accepted by ``POST /api/push`` — persist a traceable analysis."
+      },
+      "RunAnalysis": {
+        "properties": {
+          "report_md": {
+            "type": "string",
+            "title": "Report Md"
+          },
+          "proposal": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposal",
+            "description": "Proposed re-weighting; only applied if explicitly accepted."
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "'llm' | 'fallback'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "report_md",
+          "source"
+        ],
+        "title": "RunAnalysis",
+        "description": "Body returned by ``POST /api/runs/{run_id}/analysis``."
+      },
+      "RunDetail": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "trigger": {
+            "type": "string",
+            "title": "Trigger"
+          },
+          "snapshot_files": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Snapshot Files"
+          },
+          "plan": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Plan"
+          },
+          "plan_hash": {
+            "type": "string",
+            "title": "Plan Hash",
+            "default": ""
+          },
+          "qc": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Qc"
+          },
+          "validation": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Validation"
+          },
+          "status_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Status Counts"
+          },
+          "row_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Row Counts"
+          },
+          "config_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Id"
+          },
+          "config_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Version"
+          },
+          "config_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Name"
+          },
+          "data_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Path"
+          },
+          "ranking_csv": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ranking Csv"
+          },
+          "analysis": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Analysis"
+          },
+          "followup": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followup"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_id",
+          "created_at",
+          "trigger"
+        ],
+        "title": "RunDetail",
+        "description": "Full traceability record of a run (``GET /api/runs/{run_id}``)."
+      },
+      "RunRequest": {
+        "properties": {
+          "data_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Path",
+            "description": "Snapshot file or folder; defaults to the configured MRD path."
+          },
+          "id_column": {
+            "type": "string",
+            "title": "Id Column",
+            "description": "Customer id column.",
+            "default": "customer_id"
+          },
+          "date_column": {
+            "type": "string",
+            "title": "Date Column",
+            "description": "Snapshot date column.",
+            "default": "snapshot_date"
+          },
+          "window": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window",
+            "description": "How many latest snapshots to use."
+          },
+          "weights": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weights",
+            "description": "Variable -> weight."
+          },
+          "directions": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Directions",
+            "description": "Variable -> direction."
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "boolean"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled",
+            "description": "Variable -> enabled flag."
+          },
+          "filters": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FilterRule"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filters",
+            "description": "Pre-scoring row filters."
+          },
+          "categoricals": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CategoricalRule"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoricals",
+            "description": "Categorical scoring terms."
+          },
+          "config_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Id",
+            "description": "Saved configuration lineage to run; its plan is used as base."
+          },
+          "config_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Version",
+            "description": "Version within the lineage; latest when omitted."
+          }
+        },
+        "type": "object",
+        "title": "RunRequest",
+        "description": "Body accepted by ``POST /api/run``."
+      },
+      "RunSummaryInfo": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "trigger": {
+            "type": "string",
+            "title": "Trigger",
+            "description": "'manual' | 'auto-watcher'"
+          },
+          "snapshot_dates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Snapshot Dates"
+          },
+          "config_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Id"
+          },
+          "config_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Version"
+          },
+          "config_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Name"
+          },
+          "plan_hash": {
+            "type": "string",
+            "title": "Plan Hash",
+            "default": ""
+          },
+          "qc_ok": {
+            "type": "boolean",
+            "title": "Qc Ok",
+            "default": false
+          },
+          "qc_issues": {
+            "type": "integer",
+            "title": "Qc Issues",
+            "default": 0
+          },
+          "validation_ok": {
+            "type": "boolean",
+            "title": "Validation Ok",
+            "default": false
+          },
+          "rows_scored": {
+            "type": "integer",
+            "title": "Rows Scored",
+            "default": 0
+          },
+          "publishable": {
+            "type": "boolean",
+            "title": "Publishable",
+            "default": false
+          },
+          "has_ranking": {
+            "type": "boolean",
+            "title": "Has Ranking",
+            "default": false
+          },
+          "has_analysis": {
+            "type": "boolean",
+            "title": "Has Analysis",
+            "default": false
+          },
+          "has_followup": {
+            "type": "boolean",
+            "title": "Has Followup",
+            "default": false
+          },
+          "has_quality": {
+            "type": "boolean",
+            "title": "Has Quality",
+            "default": false
+          },
+          "efficiency": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Efficiency"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_id",
+          "created_at",
+          "trigger"
+        ],
+        "title": "RunSummaryInfo",
+        "description": "One row of the runs table (``GET /api/runs``)."
+      },
+      "RunsResponse": {
+        "properties": {
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/RunSummaryInfo"
+            },
+            "type": "array",
+            "title": "Runs"
+          },
+          "watch_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watch Path",
+            "description": "Folder watched for new MRD snapshots (where simulated arrivals are staged)."
+          }
+        },
+        "type": "object",
+        "title": "RunsResponse",
+        "description": "Body returned by ``GET /api/runs`` (newest first)."
+      },
+      "SaveScoringRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Human-facing name for the configuration."
+          },
+          "plan": {
+            "$ref": "#/components/schemas/WeightPlan",
+            "description": "The weighting plan to persist."
+          },
+          "config_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Id",
+            "description": "Existing lineage to append a new version to."
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Why this configuration exists.",
+            "default": ""
+          },
+          "author": {
+            "type": "string",
+            "title": "Author",
+            "description": "Who saved it.",
+            "default": ""
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin",
+            "description": "'manual' | 'propuesta-llm'",
+            "default": "manual"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "plan"
+        ],
+        "title": "SaveScoringRequest",
+        "description": "Body accepted by ``POST /api/scorings`` — persist a configuration version.\n\nSupplying ``config_id`` appends a new **version** to that lineage; omitting\nit starts a new lineage at version 1. Saved versions are never edited (D3)."
+      },
+      "SavedScoringInfo": {
+        "properties": {
+          "config_id": {
+            "type": "string",
+            "title": "Config Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "plan": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Plan"
+          },
+          "plan_hash": {
+            "type": "string",
+            "title": "Plan Hash"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "author": {
+            "type": "string",
+            "title": "Author",
+            "default": ""
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin",
+            "default": "manual"
+          }
+        },
+        "type": "object",
+        "required": [
+          "config_id",
+          "version",
+          "name",
+          "label",
+          "plan",
+          "plan_hash",
+          "created_at"
+        ],
+        "title": "SavedScoringInfo",
+        "description": "One persisted configuration version returned by the store."
+      },
+      "ScoringsResponse": {
+        "properties": {
+          "scorings": {
+            "items": {
+              "$ref": "#/components/schemas/SavedScoringInfo"
+            },
+            "type": "array",
+            "title": "Scorings"
+          },
+          "champion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChampionPointer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "scorings"
+        ],
+        "title": "ScoringsResponse",
+        "description": "The full configuration library plus the production champion."
+      },
+      "SimulatedSnapshot": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "snapshot_date": {
+            "type": "string",
+            "title": "Snapshot Date"
+          },
+          "rows": {
+            "type": "integer",
+            "title": "Rows"
+          },
+          "renewed": {
+            "type": "integer",
+            "title": "Renewed"
+          },
+          "source_path": {
+            "type": "string",
+            "title": "Source Path"
+          },
+          "watcher_enabled": {
+            "type": "boolean",
+            "title": "Watcher Enabled"
+          },
+          "interval_seconds": {
+            "type": "number",
+            "title": "Interval Seconds"
+          },
+          "from_shortlist": {
+            "type": "integer",
+            "title": "From Shortlist",
+            "default": 0
+          },
+          "adherence": {
+            "type": "number",
+            "title": "Adherence",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "path",
+          "snapshot_date",
+          "rows",
+          "renewed",
+          "source_path",
+          "watcher_enabled",
+          "interval_seconds"
+        ],
+        "title": "SimulatedSnapshot",
+        "description": "Body returned by ``POST /api/snapshots/simulate``.\n\nDescribes the snapshot file that was just staged in the watched folder, and\nwhether the watcher is on to pick it up (if it is off, nothing will run)."
+      },
+      "TopValue": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "count"
+        ],
+        "title": "TopValue",
+        "description": "One of the most frequent values of a categorical column."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WeightPlan": {
+        "properties": {
+          "weights": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weights"
+          },
+          "directions": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Directions"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "boolean"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "filters": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FilterRule"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filters"
+          },
+          "categoricals": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CategoricalRule"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoricals"
+          }
+        },
+        "type": "object",
+        "title": "WeightPlan",
+        "description": "A reusable weighting plan (same shape as an analyst proposal)."
+      },
+      "WeightsRequest": {
+        "properties": {
+          "weights": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Weights",
+            "description": "Variable -> new weight."
+          },
+          "directions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Directions",
+            "description": "Variable -> 'higher_is_better'|'lower_is_better'."
+          },
+          "enabled": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object",
+            "title": "Enabled",
+            "description": "Variable -> enabled flag (weight 0 also disables)."
+          },
+          "filters": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FilterRule"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filters",
+            "description": "Pre-scoring row filters (null keeps current)."
+          },
+          "categoricals": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CategoricalRule"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoricals",
+            "description": "Categorical scoring terms (null keeps current)."
+          }
+        },
+        "type": "object",
+        "title": "WeightsRequest",
+        "description": "Body accepted by ``POST /api/weights`` — deterministic re-configuration."
+      }
+    }
+  }
+}
